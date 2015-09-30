@@ -1,0 +1,318 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+    <script>
+        //当前单元格总行数
+        var canvasCellx = 1;
+        //当前单元格总列数
+        var canvasCelly = 1;
+        //单元格大小
+        var cellSize = 100;
+        var juzhongpianyi = Math.floor(cellSize / 2);//当map偏移达到此值 超出的瓦片将移到反方向位置
+        //在所需最少单元格基础上 添加指定数量的外框层 提高拖动时的效果 每+1边框 每行列增加2 上下左右 
+        var borderCell = 1;
+
+        //当前单元格偏移 表示拖动位置 map的左上角定位点 在初始化后 应该是0
+        var offsetMapX = 0;
+        var offsetMapY = 0;
+
+        //鼠标按下后 鼠标点与map的左上角定位点
+        var offsetMouseDownX = 0;
+        var offsetMouseDownY = 0;
+        //鼠标按下后移动
+        var offsetMouseMoveX = 0;
+        var offsetMouseMoveY = 0;
+        //鼠标是否按下
+        var mouseisdown = 0;
+
+        $("#document").ready(function () {
+
+            var d = new Date();
+            
+        var times=    document.getElementById("time");
+            times.innerText =d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+            Initial();
+            ReRank();
+            // AddCell(0, 6);
+            //计算当前画板至少需要多少单元格铺满全屏
+
+
+            //对单元格布局位置
+
+            //鼠标按下事件
+            $("#maps").mousedown(function (e) {
+                var cc = e.offsetX + " " + e.offsetY;
+                $("#mdownxy").attr("value", cc);
+
+                offsetMouseDownX = e.offsetX;
+                offsetMouseDownY = e.offsetY;
+                $("#mdownoffset").attr("value", offsetMouseMoveX + "," + offsetMouseMoveY);
+                $("#mapoffset").attr("value", (offsetMapX + offsetMouseMoveX) + "," + (offsetMapY + offsetMouseMoveY));
+                mouseisdown = 1;
+            });
+
+            //鼠标移动事件
+            $("#maps").mousemove(function (e) {
+                var cc = e.offsetX + " " + e.offsetY;
+                $("#mousexy").attr("value", cc);
+
+
+
+                if (mouseisdown == 1) {
+                    offsetMouseMoveX = e.offsetX - offsetMouseDownX;
+                    offsetMouseMoveY = e.offsetY - offsetMouseDownY;
+                    $("#middown").attr("value", "鼠标按下,移动了：" + offsetMouseMoveX + " " + offsetMouseMoveY);
+                    ReRank();
+                    $("#mdownmove").attr("value", offsetMouseMoveX + " " + offsetMouseMoveY);
+                } else {
+                    $("#middown").attr("value", "鼠标抬起");
+                }
+
+
+            });
+
+            //鼠标抬起事件
+            $("#maps").mouseup(function (e) {
+                var cc = e.offsetX + " " + e.offsetY;
+                $("#mupxy").attr("value", cc);
+
+                if (mouseisdown == 1) {
+                    offsetMapX = offsetMapX + offsetMouseMoveX;
+                    offsetMapY = offsetMapY + offsetMouseMoveY;
+
+                    offsetMouseMoveX = 0;
+                    offsetMouseMoveY = 0;
+                    mouseisdown = 0;
+                }
+                $("#mapoffset").attr("value", (offsetMapX + offsetMouseMoveX) + "," + (offsetMapY + offsetMouseMoveY));
+            });
+
+        })
+
+
+        function test() {
+
+        }
+
+
+        function Initial() {
+            var mapcanvas = document.getElementById("mapCanvas");
+            var canvaswith = mapcanvas.clientWidth;
+            var canvasheight = mapcanvas.clientHeight;
+            var cellcount = GetMinFillCell(canvaswith, canvasheight, cellSize, cellSize);
+            canvasCellx = cellcount.x + borderCell * 2;
+            canvasCelly = cellcount.y + borderCell * 2;
+            var allcellcount = (canvasCellx) * (canvasCelly);
+            AddCell(0, allcellcount);
+
+            //重置map偏移
+            offsetmapx = 0;
+            offsetmapy = 0;
+
+            return allcellcount;//返回创建的 单元格数量
+        }
+
+        //计算画板范围内至少需要多少单元格填充
+        function GetMinFillCell(canvasWidth, cavasHeight, cellWidth, cellHeight) {
+            var x = (canvasWidth / cellWidth) * 10 / 10;
+            x = Math.ceil(x);
+
+            var y = (cavasHeight / cellHeight) * 10 / 10;
+            y = Math.ceil(y);
+
+            return { "x": x, "y": y };
+        }
+
+        //向画板中添加指定行数量或列数量的单元格 在全局canvasCellx canvasCelly的基础上添加
+        function AddCellXY(xNumber, yNumber) {
+
+        }
+
+        //向画板中添加指定数量的单元格 不计算行列数 startnumber开始编号计数
+        function AddCell(startnumber, number) {
+
+            //单元格默认配置
+            var element = document.getElementById("cellTemplate");
+            var cellHtml = element.innerHTML;
+            var mapCanvas = $("#mapCanvas");
+            for (var i = 0; i < number; i++) {
+                startnumber++;
+                var cs = cellHtml.replace(/@num/g, startnumber);//使用正则 g表示全局替换
+                mapCanvas.append(cs);
+                //$("#cellitem" + startnumber).css("display", "block")
+            }
+        }
+
+        //依据当前的移动位置 从新对单元格布局
+        function ReRank() {
+
+            var mapcanvas = document.getElementById("mapCanvas");
+            var cellcount = mapcanvas.childElementCount;
+            var step = 0;
+
+            //计算map要偏移的值
+            var toOffsetX = offsetMapX + offsetMouseMoveX;
+            var toOffsetY = offsetMapY + offsetMouseMoveY;
+
+
+            $("#mapoffset").attr("value", toOffsetX + "," + toOffsetY);
+
+            var tempX = 0;
+            var tempY = 0;
+            for (var j = 0; j < canvasCelly; j++) {
+                for (var i = 0; i < canvasCellx; i++) {
+                    step++;
+                    var cell = $("#cellitem" + step);
+
+                    //计算单元格实际偏移
+                    tempX = i * cellSize + toOffsetX;
+                    tempY = j * cellSize + toOffsetY;
+
+                    var re = GetCellOffset(toOffsetX, toOffsetY, i, j, tempX, tempY);
+                    cell.css("width", cellSize);
+                    cell.css("height", cellSize);
+                    cell.css("margin-top", re.y);
+                    cell.css("margin-left", re.x);
+                    cell.css("display", "block");
+                    cell.find("#xy").html(tempX + "," + tempY + " " + re.x + "," + re.y);
+                    //if (tempX > 600) {
+                    //    cell.find("#sign").html(">600");
+                    //} else {
+                    //    cell.find("#sign").html("");
+                    //}
+                }
+            }
+        }
+
+        //换算单元格实际偏移 mapoffsetx当前map偏移 cellx单元格索引 x实际偏移
+        function GetCellOffset(mapoffsetx, mapoffsety, cellx, celly, x, y) {
+
+            var rex = x, rey = y;
+
+
+            //if (mapoffsetx >= 0) {
+            //    //$("#Text2").attr("value", ((x + 100) % 750));
+            //    if (Math.ceil((x + cellSize) / (canvasCellx * cellSize - juzhongpianyi)) > 1) { //当单元格偏移大于700 及7个单元格
+
+            //        rex = (x + cellSize + juzhongpianyi) % (cellSize * canvasCellx) - cellSize - juzhongpianyi;
+
+            //        //if (cellx == 7) {
+            //        //    $("#Text1").attr("value", rex
+
+            //        //         + " " + Math.ceil((x + 100) / 800)
+            //        //        );
+            //        //}
+
+            //    }
+            //} else {
+
+            //}
+            //if (x < -150) {
+            //    rex = x - 800 * Math.floor((x + 150) / 800);
+            //} else if (x >650) {
+            //    rex = x - 800 * Math.floor((x + 150) / 800);
+            //}
+            //if (y < -100) {
+            //    rey = y - 600 * Math.floor((y + 100) / 600);
+            //} else if (y > 400) {
+            //    rey = y - 600 * Math.floor((y + 200) / 600);
+            //}
+
+            //if (x < -cellSize-juzhongpianyi) {
+            //    rex = x - cellSize * canvasCellx * Math.floor((x + cellSize + juzhongpianyi) / cellSize * canvasCellx);
+            //} else if (x > cellSize * canvasCellx - cellSize - juzhongpianyi) {
+            //    rex = x - cellSize * canvasCellx * Math.floor((x + cellSize + juzhongpianyi) / cellSize * canvasCellx);
+            //}
+            //if (y < -cellSize - juzhongpianyi) {
+            //    rey = y - cellSize * canvasCelly * Math.floor((y + cellSize) / cellSize * canvasCelly);
+            //} else if (y > cellSize * canvasCelly - cellSize - juzhongpianyi) {
+            //    rey = y - cellSize * canvasCelly * Math.floor((y + cellSize + juzhongpianyi) / cellSize * canvasCelly);
+            //}
+            if (x <  -cellSize - juzhongpianyi) {
+                rex = x - cellSize * canvasCellx * Math.floor((x + cellSize + juzhongpianyi) / (cellSize * canvasCellx));
+            } else if (x > cellSize * canvasCellx - (cellSize + juzhongpianyi)) {
+                rex = x - cellSize * canvasCellx * Math.floor((x + cellSize + juzhongpianyi) / (cellSize * canvasCellx));
+            }
+            if (y <  -cellSize - juzhongpianyi) {
+                rey = y - cellSize * canvasCelly * Math.floor((y + cellSize + juzhongpianyi) / (cellSize * canvasCelly));
+            } else if (y > cellSize*canvasCelly-(cellSize+juzhongpianyi)) {
+                rey = y - cellSize * canvasCelly * Math.floor((y + cellSize + juzhongpianyi) / (cellSize * canvasCelly));
+            }
+            return { "x": rex, "y": rey };
+
+        }
+    </script>
+
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        /*画板*/
+        .mapcanvas {
+            width: 600px;
+            height: 400px;
+            border: burlywood solid 1px;
+            overflow: hidden;
+            /*position: absolute;*/
+            margin-left: 400px;
+            margin-top: 100px;
+            top: 0px;
+        }
+
+        /*单元格样式*/
+        .cellitem {
+            border: chartreuse solid 1px;
+            display: none;
+            position: absolute;
+        }
+    </style>
+
+    <div>
+        
+        <!-- 工作区start-->
+        <div id="mapCanvas" class="mapcanvas">
+            <div id="posSign"></div>
+        </div>
+        <!--工作区end-->
+        <div id="maps" style="z-index: 100; top: 100px; left: 400px; width: 600px; height: 400px; border-style: solid; position: absolute">
+        </div>
+    </div>
+    <div id="template" style="display: none">
+        <div id="cellTemplate">
+            <div id='cellitem@num' class='cellitem'>
+                <label>@num</label><br/>
+                <label id="xy" style="font-weight: bold"></label><br/>
+                <label id="sign"></label>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: absolute; top: 0;">
+        <button id="initial" onclick="Initial();">初始</button>
+        <button id="reRank" onclick="ReRank();">重排</button>
+        <ul>
+            <li><label id="time"></label></li>
+            <li>鼠标位置<input id="mousexy" type="text" value="" /></li>
+            <li>按下位置<input id="mdownxy" type="text" value="" /></li>
+            <li>抬起位置<input id="mupxy" type="text" value="" /></li>
+            <li>map偏移<input id="mapoffset" type="text" value="" /></li>
+            <li>鼠标按下偏移<input id="mdownoffset" type="text" value="" /></li>
+            <li>鼠标按下后移动<input id="mdownmove" type="text" value="" /></li>
+            <li>
+                <input id="middown" type="text" value="" /></li>
+            <li>实际偏移<input id="Text1" type="text" value="" /></li>
+            <li>test<input id="Text2" type="text" value="" />
+            </li>
+        </ul>
+    </div>
+
+</body>
+</html>
