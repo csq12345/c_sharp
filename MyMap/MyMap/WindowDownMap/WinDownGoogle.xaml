@@ -10,6 +10,8 @@
         <TextBox Name="TextBoxY1" HorizontalAlignment="Left" Height="23" Margin="105,85,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <TextBox Name="TextBoxY2" HorizontalAlignment="Left" Height="23" Margin="275,85,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <Button Name="ButtonSS" Content="开始" HorizontalAlignment="Left" Margin="275,263,0,0" VerticalAlignment="Top" Width="75" Click="ButtonSS_Click"/>
+        <Label Content="缩放[4,]" HorizontalAlignment="Left" Margin="45,136,0,0" VerticalAlignment="Top"/>
+        <ComboBox  Name="ComboBoxZoom" HorizontalAlignment="Left" Margin="105,140,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBoxZoom_SelectionChanged"/>
 
     </Grid>
 </Window>
