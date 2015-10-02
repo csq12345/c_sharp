@@ -30,7 +30,8 @@ namespace MyMap.ToolHelper
                 return;
             }
             string url = "";
-
+            int partnum = 0;
+            string partDoc = "";
             urls.Clear();
             for (int x = x1; x <= x2; x++)
             {
@@ -39,8 +40,17 @@ namespace MyMap.ToolHelper
                     url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
                     DownModel dm = new DownModel();
                     dm.Url = url;
-                    Directory.CreateDirectory(directorypath + "/" + zoom);
-                    dm.Fielname = directorypath + "/" + zoom + "/" + zoom + "_" + x + "_" + y + ".png";
+                    
+                    partnum= (int)Math.Floor((double)((x+1)*(y2+1)/1000));
+                  
+                    
+                    partDoc = directorypath + "/" + zoom + "_" + partnum;
+                    if (!Directory.Exists(partDoc))
+                    {
+                        Directory.CreateDirectory(partDoc);
+                    }
+                  
+                   dm.Fielname = partDoc + "/" + zoom + "_" + x + "_" + y + ".png";
                     urls.Enqueue(dm);
                 }
             }
@@ -48,6 +58,7 @@ namespace MyMap.ToolHelper
 
             if (urls.Count > 0)
             {
+                downcount = 0;
                 isRun = true;
                 for (int i = 0; i < threadnumber; i++)
                 {
@@ -79,7 +90,9 @@ namespace MyMap.ToolHelper
             webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
             if (e.Error == null)
             {
+               
                 downcount++;
+                OnPrecessEvent(downcount);
                 if (!isRun)
                 {
                     //完成下载 触发事件
@@ -209,6 +222,19 @@ namespace MyMap.ToolHelper
             if (oncomplete != null)
             {
                 oncomplete(AllCompleteCount);
+            }
+        }
+
+
+        public delegate void OnPrecess(int AllCompleteCount);
+
+        public event OnPrecess onprecess;
+
+        public void OnPrecessEvent(int precesspart)
+        {
+            if (onprecess != null)
+            {
+                onprecess(precesspart);
             }
         }
         #endregion

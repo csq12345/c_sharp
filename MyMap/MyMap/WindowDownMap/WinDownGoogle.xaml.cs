@@ -45,7 +45,9 @@ namespace MyMap.WindowDownMap
             {
 
                 
-                downTool.oncomplete += downTool_oncomplete; ;
+                downTool.oncomplete += downTool_oncomplete;
+                downTool.onprecess += downTool_onprecess;
+
                 int x1 = 0, x2 = 0, y1 = 0, y2 = 0, zoom = 0;
 
                 int.TryParse(TextBoxX1.Text, out x1);
@@ -61,12 +63,27 @@ namespace MyMap.WindowDownMap
             }
         }
 
+        void downTool_onprecess(int AllCompleteCount)
+        {
+            SetProcessValue(AllCompleteCount);
+        }
+
+
+        void SetProcessValue(int value)
+        {
+            TextBoxcompletecount.Dispatcher.BeginInvoke( new Action(
+                ()=>TextBoxcompletecount.Text=value.ToString()
+                )
+                ,null
+            );
+        }
+
         void downTool_oncomplete(int AllCompleteCount)
         {
             isrun = false;
             ButtonSS.Content = "开始";
             MessageBox.Show("完成下载：" + AllCompleteCount + " 错误:" + downTool.errdm.Count);
-            ;
+             
         }
 
         private void ComboBoxZoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -75,6 +92,7 @@ namespace MyMap.WindowDownMap
           Zoom zm=  zoomlevel.GetLevel(z);
             TextBoxX2.Text = zm.maxX.ToString();
             TextBoxY2.Text = zm.maxX.ToString();
+            TextBoxAll.Text = ((zm.maxX+1)*(zm.maxY+1)).ToString();
         }
 
     }
