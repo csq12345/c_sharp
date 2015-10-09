@@ -3,17 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WinDownGoogle" Height="338.202" Width="457.303">
     <Grid>
-        <Label Content="X范围" HorizontalAlignment="Left" Margin="45,41,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="TextBoxX1" HorizontalAlignment="Left" Height="23" Margin="105,41,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxX2" HorizontalAlignment="Left" Height="23" Margin="275,41,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <Label Content="Y范围" HorizontalAlignment="Left" Margin="45,85,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="TextBoxY1" HorizontalAlignment="Left" Height="23" Margin="105,85,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxY2" HorizontalAlignment="Left" Height="23" Margin="275,85,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="X范围" HorizontalAlignment="Left" Margin="45,3,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="TextBoxX1" HorizontalAlignment="Left" Height="23" Margin="105,3,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxX2" HorizontalAlignment="Left" Height="23" Margin="275,3,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Y范围" HorizontalAlignment="Left" Margin="45,47,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="TextBoxY1" HorizontalAlignment="Left" Height="23" Margin="105,47,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxY2" HorizontalAlignment="Left" Height="23" Margin="275,47,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <Button Name="ButtonSS" Content="开始" HorizontalAlignment="Left" Margin="275,263,0,0" VerticalAlignment="Top" Width="75" Click="ButtonSS_Click"/>
-        <Label Content="缩放[4,]" HorizontalAlignment="Left" Margin="45,136,0,0" VerticalAlignment="Top"/>
-        <ComboBox  Name="ComboBoxZoom" HorizontalAlignment="Left" Margin="105,140,0,0" VerticalAlignment="Top" Width="44" SelectionChanged="ComboBoxZoom_SelectionChanged"/>
-        <TextBox Name="TextBoxcompletecount" HorizontalAlignment="Left" Height="23" Margin="169,140,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
-        <TextBox Name="TextBoxAll" HorizontalAlignment="Left" Height="23" Margin="294,140,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
+        <Label Content="缩放[4,]" HorizontalAlignment="Left" Margin="45,98,0,0" VerticalAlignment="Top"/>
+        <ComboBox  Name="ComboBoxZoom" HorizontalAlignment="Left" Margin="105,102,0,0" VerticalAlignment="Top" Width="44" SelectionChanged="ComboBoxZoom_SelectionChanged"/>
+        <TextBox Name="TextBoxcompletecount" HorizontalAlignment="Left" Height="23" Margin="169,102,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
+        <TextBox Name="TextBoxAll" HorizontalAlignment="Left" Height="23" Margin="294,102,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
+        <TextBox x:Name="TextBoxLatitude" HorizontalAlignment="Left" Height="23" Margin="45,193,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TextBoxLongitude" HorizontalAlignment="Left" Height="23" Margin="45,165,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="ButtonConvertBlock" Content="换算成图块" HorizontalAlignment="Left" Margin="185,177,0,0" VerticalAlignment="Top" Width="75" Click="ButtonConvertBlock_Click"/>
+        <TextBox x:Name="TextBoxX" HorizontalAlignment="Left" Height="23" Margin="275,165,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TextBoxY" HorizontalAlignment="Left" Height="23" Margin="275,193,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Button Name="ButtonReady" Content="估算" HorizontalAlignment="Left" Margin="294,130,0,0" VerticalAlignment="Top" Width="75" Click="ButtonReady_Click"/>
 
     </Grid>
 </Window>

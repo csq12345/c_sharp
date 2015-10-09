@@ -40,11 +40,11 @@ namespace MyMap.ToolHelper
                     url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
                     DownModel dm = new DownModel();
                     dm.Url = url;
-                    
-                    partnum= (int)Math.Floor((double)((x+1)*(y2+1)/1000));
-                  
-                    
-                    partDoc = directorypath + "/" + zoom + "_" + partnum;
+
+                    partnum = (int)Math.Floor((double)((x + 1) * (zm.maxY + 1) / 1000));//计算分部文件夹编号
+
+
+                    partDoc = directorypath + "/" + zoom+"/" + zoom + "_" + partnum;
                     if (!Directory.Exists(partDoc))
                     {
                         Directory.CreateDirectory(partDoc);
