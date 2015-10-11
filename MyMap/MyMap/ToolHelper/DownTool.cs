@@ -6,6 +6,7 @@ using System.Net;
 using System.Security.Policy;
 using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MyMap.ToolHelper
 {
@@ -20,54 +21,58 @@ namespace MyMap.ToolHelper
         /// 下载异常的地址
         /// </summary>
         public List<DownModel> errdm = new List<DownModel>();
-        public void DownStart(int x1, int x2, int y1, int y2, int zoom, string directorypath,int threadnumber)
+        public void DownStart(int x1, int x2, int y1, int y2, int zoom, string directorypath, int threadnumber)
         {
-
-            allThreadNumber = threadnumber;
-            Zoom zm = zoomlevel.GetLevel(zoom);
-            if (x2 > zm.maxX || y2 > zm.maxY)
+            Task t = new Task(() =>
             {
-                return;
-            }
-            string url = "";
-            int partnum = 0;
-            string partDoc = "";
-            urls.Clear();
-            for (int x = x1; x <= x2; x++)
-            {
-                for (int y = y1; y <= y2; y++)
+                allThreadNumber = threadnumber;
+                Zoom zm = zoomlevel.GetLevel(zoom);
+                if (x2 > zm.maxX || y2 > zm.maxY)
                 {
-                    url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
-                    DownModel dm = new DownModel();
-                    dm.Url = url;
-
-                    partnum = (int)Math.Floor((double)((x + 1) * (zm.maxY + 1) / 1000));//计算分部文件夹编号
-
-
-                    partDoc = directorypath + "/" + zoom+"/" + zoom + "_" + partnum;
-                    if (!Directory.Exists(partDoc))
+                    return;
+                }
+                string url = "";
+                int partnum = 0;
+                string partDoc = "";
+                urls.Clear();
+                for (int x = x1; x <= x2; x++)
+                {
+                    for (int y = y1; y <= y2; y++)
                     {
-                        Directory.CreateDirectory(partDoc);
+                        url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
+                        DownModel dm = new DownModel();
+                        dm.Url = url;
+
+                        partnum = (int)Math.Floor((double)((double)(x + 1) * (double)(zm.maxY + 1) / 1000));//计算分部文件夹编号
+
+
+                        partDoc = directorypath + "/" + zoom + "/" + zoom + "_" + partnum;
+                        if (!Directory.Exists(partDoc))
+                        {
+                            Directory.CreateDirectory(partDoc);
+                        }
+
+                        dm.Fielname = partDoc + "/" + zoom + "_" + x + "_" + y + ".png";
+                        urls.Enqueue(dm);
                     }
-                  
-                   dm.Fielname = partDoc + "/" + zoom + "_" + x + "_" + y + ".png";
-                    urls.Enqueue(dm);
                 }
-            }
 
 
-            if (urls.Count > 0)
-            {
-                downcount = 0;
-                isRun = true;
-                for (int i = 0; i < threadnumber; i++)
+                if (urls.Count > 0)
                 {
-                    NextQuery();
-                }
+                    downcount = 0;
+                    isRun = true;
+                    for (int i = 0; i < threadnumber; i++)
+                    {
+                        NextQuery();
+                    }
 
-                //webClient.DownloadDataAsync(uri,dm);
-                //MemoryStream ms = DoRequest(uri, dm);
-            }
+                    //webClient.DownloadDataAsync(uri,dm);
+                    //MemoryStream ms = DoRequest(uri, dm);
+                }
+            });
+
+            t.Start();
 
         }
 
@@ -81,18 +86,30 @@ namespace MyMap.ToolHelper
             Uri uri = new Uri(dm.Url);
             WebClient webClient = GetWebClient();
             webClient.DownloadFileAsync(uri, dm.Fielname, dm);
+            //   Task t = new Task(() =>
+            //   {
+
+            //   }
+            //);
+
+            //   t.Start();
+
         }
 
         void webClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            WebClient webClient = (WebClient)sender;
-            webClient.DownloadDataCompleted -= webClient_DownloadDataCompleted;
-            webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
+            //WebClient webClient = (WebClient)sender;
+            //webClient.DownloadDataCompleted -= webClient_DownloadDataCompleted;
+            //webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
             if (e.Error == null)
             {
-               
+
                 downcount++;
-                OnPrecessEvent(downcount);
+                if (downcount%20 == 0)
+                {
+                        OnPrecessEvent(downcount);
+                }
+            
                 if (!isRun)
                 {
                     //完成下载 触发事件
@@ -103,8 +120,8 @@ namespace MyMap.ToolHelper
                     if (allThreadNumber == 0)
                     {
                         OnCompleteEvent(downcount);
+
                     }
-                    
                 }
                 else
                 {
@@ -119,7 +136,7 @@ namespace MyMap.ToolHelper
                         {
                             allThreadNumber--;
                         }
-                        if (allThreadNumber==0)
+                        if (allThreadNumber == 0)
                         {
                             OnCompleteEvent(downcount);
                         }

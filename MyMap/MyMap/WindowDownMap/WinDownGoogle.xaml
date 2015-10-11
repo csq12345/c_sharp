@@ -20,6 +20,7 @@
         <TextBox x:Name="TextBoxX" HorizontalAlignment="Left" Height="23" Margin="275,165,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="TextBoxY" HorizontalAlignment="Left" Height="23" Margin="275,193,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <Button Name="ButtonReady" Content="估算" HorizontalAlignment="Left" Margin="294,130,0,0" VerticalAlignment="Top" Width="75" Click="ButtonReady_Click"/>
+        <TextBox Name="TextBoxThreadNum" HorizontalAlignment="Left" Height="23" Margin="205,263,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="55"/>
 
     </Grid>
 </Window>

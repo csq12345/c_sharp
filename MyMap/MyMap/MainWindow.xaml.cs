@@ -28,7 +28,8 @@ namespace MyMap
         private void ButtonDownGoogle_Click(object sender, RoutedEventArgs e)
         {
             WinDownGoogle winDownGoogle=new WinDownGoogle();
-            winDownGoogle.Show();
+            winDownGoogle.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            winDownGoogle.ShowDialog();
         }
     }
 }

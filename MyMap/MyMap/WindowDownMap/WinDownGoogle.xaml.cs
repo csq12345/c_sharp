@@ -48,17 +48,17 @@ namespace MyMap.WindowDownMap
                 downTool.oncomplete += downTool_oncomplete;
                 downTool.onprecess += downTool_onprecess;
 
-                int x1 = 0, x2 = 0, y1 = 0, y2 = 0, zoom = 0;
+                int x1 = 0, x2 = 0, y1 = 0, y2 = 0, zoom = 0,t=1;
 
                 int.TryParse(TextBoxX1.Text, out x1);
                 int.TryParse(TextBoxX2.Text, out x2);
                 int.TryParse(TextBoxY1.Text, out y1);
                 int.TryParse(TextBoxY2.Text, out y2);
-
+                int.TryParse(TextBoxThreadNum.Text, out t);
                 TextBoxAll.Text = ((x2 - x1 + 1)*(y2 - y1 + 1)).ToString();
                 zoom = int.Parse(ComboBoxZoom.SelectedItem.ToString());
 
-                downTool.DownStart(x1, x2, y1, y2, zoom, "D:/temp/googlepic", 5);
+                downTool.DownStart(x1, x2, y1, y2, zoom, "D:/temp/googlepic", t);
 
                 isrun = true;
                 ButtonSS.Content = "停止";
@@ -83,9 +83,13 @@ namespace MyMap.WindowDownMap
         void downTool_oncomplete(int AllCompleteCount)
         {
             isrun = false;
-            ButtonSS.Content = "开始";
+            ButtonSS.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                ButtonSS.Content = "开始";
+           
+              
+            }));
             MessageBox.Show("完成下载：" + AllCompleteCount + " 错误:" + downTool.errdm.Count);
-             
         }
 
         private void ComboBoxZoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -109,8 +113,8 @@ namespace MyMap.WindowDownMap
             int.TryParse(ComboBoxZoom.SelectedItem.ToString(), out z);
 
           
-            double bx = TMS.LongitudeToBlock(x, z);
-            double by = TMS.LatitudeToBlock(y, z) ;
+            int bx = (int)TMS.LongitudeToBlock(x, z);
+            int  by = (int)TMS.LatitudeToBlock(y, z) ;
 
             TextBoxX.Text = bx.ToString();
             TextBoxY.Text = by.ToString();
