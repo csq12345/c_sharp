@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Text;
@@ -21,6 +22,7 @@ using Color = System.Windows.Media.Color;
 using FontFamily = System.Windows.Media.FontFamily;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
+using System.Windows.Markup;
 
 namespace ToMyHeart
 {
@@ -29,7 +31,7 @@ namespace ToMyHeart
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        List<string[]> datas = new List<string[]>();
         /// <summary>
         /// 选中边框
         /// </summary>
@@ -219,6 +221,8 @@ namespace ToMyHeart
         {
             try
             {
+                XmlLanguage xlcn = XmlLanguage.GetLanguage("zh-cn");
+                XmlLanguage xlen = XmlLanguage.GetLanguage("en-us");
                 if (CanvasDraw.Children.Count > 0)
                 {
 
@@ -226,25 +230,51 @@ namespace ToMyHeart
 
                     System.Drawing.Image img = System.Drawing.Image.FromFile(imagepath);
                     Graphics gra = Graphics.FromImage(bitmap);
-                    gra.DrawImage(img, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height));
-                    foreach (var item in CanvasDraw.Children)
-                    {
-                        if (item.GetType().FullName == "System.Windows.Controls.Border")
-                        {
-                            Border b = item as Border;
-                            MyUITextBlock myUiTextBlock = b.Tag as MyUITextBlock;
-                            TextBlock tb = b.Child as TextBlock;
 
-                            gra.DrawString(tb.Text
-                                , new Font(myUiTextBlock.FontFamily.Source, (float)tb.FontSize),
-                                new SolidBrush(System.Drawing.Color.FromArgb(myUiTextBlock.FontColor.R,
-                                    myUiTextBlock.FontColor.G, myUiTextBlock.FontColor.B)),
-                                    new RectangleF((float)myUiTextBlock.mx, (float)myUiTextBlock.my, (float)tb.Width, (float)tb.Height)
-                               );
+
+                    for (int i = 0; i < datas.Count; i++)
+                    {
+
+
+                        gra.Clear(System.Drawing.Color.Black);
+                        gra.DrawImage(img, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                       new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
+                        int childcount = 0;
+                        foreach (var item in CanvasDraw.Children)
+                        {
+                            if (item.GetType().FullName == "System.Windows.Controls.Border")
+                            {
+                                string drawstr = "X";
+                                if (datas[i].Length > childcount)
+                                {
+                                    drawstr = datas[i][childcount];
+                                }
+                                childcount++;
+                                Border b = item as Border;
+                                MyUITextBlock myUiTextBlock = b.Tag as MyUITextBlock;
+                                TextBlock tb = b.Child as TextBlock;
+                                string fontname = "";
+                                bool ff = myUiTextBlock.FontFamily.FamilyNames.TryGetValue(xlcn, out fontname);
+                                if (!ff)
+                                {
+                                    myUiTextBlock.FontFamily.FamilyNames.TryGetValue(xlen, out fontname);
+                                }
+                               
+                                Font font = new Font(fontname, (float)tb.FontSize, GraphicsUnit.Pixel);
+                                gra.DrawString(drawstr
+                                    , font,
+                                    new SolidBrush(System.Drawing.Color.FromArgb(myUiTextBlock.FontColor.R,
+                                        myUiTextBlock.FontColor.G, myUiTextBlock.FontColor.B)),
+                                        (float)myUiTextBlock.mx, 
+                                        (float)myUiTextBlock.my);
+                            }
                         }
+                        bitmap.Save("d:/ff" + i + ".jpg", ImageFormat.Jpeg);
                     }
 
-                    bitmap.Save("d:/ff.jpg", ImageFormat.Jpeg);
+
+
+
                 }
                 else
                 {
@@ -257,6 +287,34 @@ namespace ToMyHeart
                 System.Windows.MessageBox.Show(ex.Message);
             }
 
+        }
+
+
+
+        private void ButtonLoadDoc_OnClick(object sender, RoutedEventArgs e)
+        {
+            datas.Clear();
+            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            DialogResult dr = openFileDialog.ShowDialog();
+            if (dr == System.Windows.Forms.DialogResult.OK)
+            {
+                FileStream fs = File.Open(openFileDialog.FileName, FileMode.Open);
+                StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gbk"));
+
+                while (true)
+                {
+                    string linedata = sr.ReadLine();
+                    if (string.IsNullOrEmpty(linedata))
+                    {
+                        break;
+
+                    }
+                    string[] data = linedata.Split(new char[] { ',' });
+                    datas.Add(data);
+
+                }
+                System.Windows.Forms.MessageBox.Show("共导入 " + datas.Count + " 行");
+            }
         }
     }
 }
