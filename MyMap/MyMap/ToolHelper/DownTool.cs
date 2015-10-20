@@ -153,6 +153,7 @@ namespace MyMap.ToolHelper
         void webClient_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
         {
             WebClient webClient = (WebClient)sender;
+           
             webClient.DownloadDataCompleted -= webClient_DownloadDataCompleted;
             webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
             if (e.Error == null)

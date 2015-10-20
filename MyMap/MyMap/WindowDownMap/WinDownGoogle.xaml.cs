@@ -86,8 +86,6 @@ namespace MyMap.WindowDownMap
             ButtonSS.Dispatcher.BeginInvoke(new Action(() =>
             {
                 ButtonSS.Content = "开始";
-           
-              
             }));
             MessageBox.Show("完成下载：" + AllCompleteCount + " 错误:" + downTool.errdm.Count);
         }
