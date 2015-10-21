@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ToMyHeart.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="600" Width="400">
+        Title="ToMyHeart" Height="600" Width="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100"></RowDefinition>
@@ -17,12 +17,12 @@
         </Canvas>
         <Grid Grid.Row="0">
             <Button Name="ButtonLoad" Content="加载背图" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="ButtonLoad_OnClick"/>
-            <Button Name="ButtonAdd" Content="加载元素" HorizontalAlignment="Left" Margin="90,10,0,0" VerticalAlignment="Top" Width="75" Click="ButtonAdd_Click"/>
+            <Button Name="ButtonAdd" Content="加载元素" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" Width="75" Click="ButtonAdd_Click"/>
             <Button Name="ButtonFont" Content="字体" HorizontalAlignment="Left" Margin="307,68,0,0" VerticalAlignment="Top" Width="75" Click="ButtonFont_Click"/>
             <TextBox Name="TextBoxSize" HorizontalAlignment="Left" Height="23" Margin="245,68,0,0" TextWrapping="Wrap" Text="12" VerticalAlignment="Top" Width="41" TextChanged="TextBoxSize_OnTextChanged" Foreground="Black"/>
             <Button Name="ButtonColor" Content="颜色" HorizontalAlignment="Left" Margin="154,68,0,0" VerticalAlignment="Top" Width="75" Click="ButtonColor_OnClick"/>
-            <Button Name="ButtonBuild" Content="生成" HorizontalAlignment="Left" Margin="311,10,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.019,0.602" Click="ButtonBuild_OnClick"/>
-            <Button Name="ButtonLoadDoc" Content="加载数据" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Width="75" Click="ButtonLoadDoc_OnClick"/>
+            <Button Name="ButtonBuild" Content="生成" HorizontalAlignment="Left" Margin="224,10,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.019,0.602" Click="ButtonBuild_OnClick"/>
+            <Button Name="ButtonLoadDoc" Content="加载数据" HorizontalAlignment="Left" Margin="90,10,0,0" VerticalAlignment="Top" Width="75" Click="ButtonLoadDoc_OnClick"/>
         </Grid>
     </Grid>
 </Window>

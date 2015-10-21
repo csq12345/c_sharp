@@ -23,6 +23,7 @@ using FontFamily = System.Windows.Media.FontFamily;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 using System.Windows.Markup;
+using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
 namespace ToMyHeart
 {
@@ -65,26 +66,64 @@ namespace ToMyHeart
         private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
             //添加元素
+            if (CanvasDraw.Children.Count > 0)
+            {
+                if (datas.Count > 0)
+                {
 
-            Border textBorder = new Border();
-            textBorder.BorderThickness = new Thickness(1);
-            textBorder.BorderBrush = noSelectBrush;
+
+                    Border textBorder = new Border();
+                    textBorder.BorderThickness = new Thickness(1);
+                    textBorder.BorderBrush = noSelectBrush;
 
 
-            TextBlock textBlock = new TextBlock();
-            textBorder.Child = textBlock;
-            textBlock.Text = ("xxxxxxx" + (CanvasDraw.Children.Count + 1)).PadRight(8);
-            textBorder.Tag = new MyUITextBlock() { mx = 0, my = 0, FontFamily = textBlock.FontFamily };
-            var fonts = Fonts.SystemFontFamilies;
+                    TextBlock textBlock = new TextBlock();
+                    textBorder.Child = textBlock;
 
-            CanvasDraw.Children.Add(textBorder);
+                    //获取第一个数据做为显示预览
+                    string showtxt = "";
+                    if (datas.Count > 0)
+                    {
+                        showtxt = datas[0][CanvasDraw.Children.Count - 1];
+                    }
 
+                    //textBlock.Text = ("列xxxxxx" + (CanvasDraw.Children.Count)).PadRight(8);
+                    textBlock.Text = showtxt;
+                    textBorder.Tag = new MyUITextBlock() {mx = 1, my = 1, FontFamily = textBlock.FontFamily};
+                    var fonts = Fonts.SystemFontFamilies;
+
+                    CanvasDraw.Children.Add(textBorder);
+                    Canvas.SetLeft(textBorder, 1);
+                    Canvas.SetTop(textBorder,1);
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("先加载数据");
+                }
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("先加载图片");
+            }
 
         }
 
         private void CanvasDraw_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             mouseDown = true;
+
+            selectElement = null;
+            var canvas = sender as Canvas;
+            foreach (var item in canvas.Children)
+            {
+
+                if (item.GetType().FullName == "System.Windows.Controls.Border")
+                {
+                    var border = item as Border;
+                    border.BorderThickness = new Thickness(1);
+                    border.BorderBrush = noSelectBrush;
+                }
+            }
 
             var textblock = e.Source as TextBlock;
             if (textblock != null)
@@ -97,21 +136,21 @@ namespace ToMyHeart
                 mouseDownPoint = e.GetPosition(sender as Canvas);
                 mouseDownPointByBorder = e.GetPosition(border);
             }
-            else
-            {
-                selectElement = null;
-                var canvas = sender as Canvas;
-                foreach (var item in canvas.Children)
-                {
+            //else
+            //{
+            //    selectElement = null;
+            //    var canvas = sender as Canvas;
+            //    foreach (var item in canvas.Children)
+            //    {
 
-                    if (item.GetType().FullName == "System.Windows.Controls.Border")
-                    {
-                        var border = item as Border;
-                        border.BorderThickness = new Thickness(1);
-                        border.BorderBrush = noSelectBrush;
-                    }
-                }
-            }
+            //        if (item.GetType().FullName == "System.Windows.Controls.Border")
+            //        {
+            //            var border = item as Border;
+            //            border.BorderThickness = new Thickness(1);
+            //            border.BorderBrush = noSelectBrush;
+            //        }
+            //    }
+            //}
         }
 
         private void CanvasDraw_OnPreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -221,64 +260,68 @@ namespace ToMyHeart
         {
             try
             {
-                XmlLanguage xlcn = XmlLanguage.GetLanguage("zh-cn");
-                XmlLanguage xlen = XmlLanguage.GetLanguage("en-us");
-                if (CanvasDraw.Children.Count > 0)
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-
-                    Bitmap bitmap = new Bitmap((int)ImageBack.Source.Width, (int)ImageBack.Source.Height);
-
-                    System.Drawing.Image img = System.Drawing.Image.FromFile(imagepath);
-                    Graphics gra = Graphics.FromImage(bitmap);
-
-
-                    for (int i = 0; i < datas.Count; i++)
+                    XmlLanguage xlcn = XmlLanguage.GetLanguage("zh-cn");
+                    XmlLanguage xlen = XmlLanguage.GetLanguage("en-us");
+                    if (CanvasDraw.Children.Count > 0)
                     {
 
+                        Bitmap bitmap = new Bitmap((int) ImageBack.Source.Width, (int) ImageBack.Source.Height);
 
-                        gra.Clear(System.Drawing.Color.Black);
-                        gra.DrawImage(img, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                       new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
-                        int childcount = 0;
-                        foreach (var item in CanvasDraw.Children)
+                        System.Drawing.Image img = System.Drawing.Image.FromFile(imagepath);
+                        Graphics gra = Graphics.FromImage(bitmap);
+
+
+                        for (int i = 0; i < datas.Count; i++)
                         {
-                            if (item.GetType().FullName == "System.Windows.Controls.Border")
+
+
+                            gra.Clear(System.Drawing.Color.Black);
+                            gra.DrawImage(img, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), GraphicsUnit.Pixel);
+                            int childcount = 0;
+                            foreach (var item in CanvasDraw.Children)
                             {
-                                string drawstr = "X";
-                                if (datas[i].Length > childcount)
+                                if (item.GetType().FullName == "System.Windows.Controls.Border")
                                 {
-                                    drawstr = datas[i][childcount];
+                                    string drawstr = "X";
+                                    if (datas[i].Length > childcount)
+                                    {
+                                        drawstr = datas[i][childcount];
+                                    }
+                                    childcount++;
+                                    Border b = item as Border;
+                                    MyUITextBlock myUiTextBlock = b.Tag as MyUITextBlock;
+                                    TextBlock tb = b.Child as TextBlock;
+                                    string fontname = "";
+                                    bool ff = myUiTextBlock.FontFamily.FamilyNames.TryGetValue(xlcn, out fontname);
+                                    if (!ff)
+                                    {
+                                        myUiTextBlock.FontFamily.FamilyNames.TryGetValue(xlen, out fontname);
+                                    }
+
+                                    Font font = new Font(fontname, (float) tb.FontSize, GraphicsUnit.Pixel);
+                                    gra.DrawString(drawstr
+                                        , font,
+                                        new SolidBrush(System.Drawing.Color.FromArgb(myUiTextBlock.FontColor.R,
+                                            myUiTextBlock.FontColor.G, myUiTextBlock.FontColor.B)),
+                                        (float) myUiTextBlock.mx,
+                                        (float) myUiTextBlock.my);
                                 }
-                                childcount++;
-                                Border b = item as Border;
-                                MyUITextBlock myUiTextBlock = b.Tag as MyUITextBlock;
-                                TextBlock tb = b.Child as TextBlock;
-                                string fontname = "";
-                                bool ff = myUiTextBlock.FontFamily.FamilyNames.TryGetValue(xlcn, out fontname);
-                                if (!ff)
-                                {
-                                    myUiTextBlock.FontFamily.FamilyNames.TryGetValue(xlen, out fontname);
-                                }
-                               
-                                Font font = new Font(fontname, (float)tb.FontSize, GraphicsUnit.Pixel);
-                                gra.DrawString(drawstr
-                                    , font,
-                                    new SolidBrush(System.Drawing.Color.FromArgb(myUiTextBlock.FontColor.R,
-                                        myUiTextBlock.FontColor.G, myUiTextBlock.FontColor.B)),
-                                        (float)myUiTextBlock.mx, 
-                                        (float)myUiTextBlock.my);
                             }
+                            bitmap.Save(saveFileDialog.FileName + i + ".jpg", ImageFormat.Jpeg);
                         }
-                        bitmap.Save("d:/ff" + i + ".jpg", ImageFormat.Jpeg);
+
+
+
+
                     }
-
-
-
-
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("别逗我，啥也没有怎么弄啊？");
+                    else
+                    {
+                        System.Windows.MessageBox.Show("别逗我，啥也没有怎么弄啊？");
+                    }
                 }
             }
             catch (Exception ex)
