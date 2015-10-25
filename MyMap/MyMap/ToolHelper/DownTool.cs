@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Policy;
 using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyMap.ToolHelper
@@ -16,18 +18,72 @@ namespace MyMap.ToolHelper
         Queue<DownModel> urls = new Queue<DownModel>();
         private int downcount = 0;
         bool isRun = false;
-        private int allThreadNumber = 0;
+
+        private ThreadCount tc = new ThreadCount();
+        class ThreadCount
+        {
+            public int allThreadNumber
+            {
+                get;
+                set;
+            }
+        }
+
         /// <summary>
         /// 下载异常的地址
         /// </summary>
         public List<DownModel> errdm = new List<DownModel>();
-        public void DownStart(int x1, int x2, int y1, int y2, int zoom, string directorypath, int threadnumber)
+
+        private int threacount = 0;
+        private SaveInfo saveInfo;
+
+
+        private int passx = 0;
+        private int passy = 0;
+        private int endx = 0;
+        private int endy = 0;
+        private int _zoom = 0;
+        private string _directorypath = "";
+        private int _threadnumber = 0;
+        private int _startx = 0;
+        private int _starty = 0;
+        private MapType _mt;
+
+        public void DownStart(MapType mt, int x1, int x2, int y1, int y2, int zoom, string directorypath, int threadnumber, int startx, int starty)
         {
-            Task t = new Task(() =>
+            saveInfo = new SaveInfo() { level = zoom, stopx = 0, stopy = 0 };
+            saveInfo.savepath = directorypath + "/" + (int)mt;
+            threacount = threadnumber;
+            tc.allThreadNumber = threadnumber;
+            endx = x2;
+            endy = y2;
+            _zoom = zoom;
+            directorypath = _directorypath;
+            _startx = startx;
+            _starty = starty;
+            _mt = mt;
+            //passx = x1;
+            //passy = y1;
+            CreateThread(x1, y1);
+        }
+
+        public void CreateThread(int x1, int y1)
+        {
+            Thread ttt = new Thread(new ParameterizedThreadStart(Create));
+            ttt.Start(new{x1=x1, y1=y1});
+        }
+        public void Create(object obj)
+        {
+            dynamic objvar = obj;
+            int x1=objvar.x1;
+            int y1 = objvar.y1;
+            if (urls.Count < 200)
             {
-                allThreadNumber = threadnumber;
-                Zoom zm = zoomlevel.GetLevel(zoom);
-                if (x2 > zm.maxX || y2 > zm.maxY)
+                OnPrecessStatuEvent("队列不足200 继续创建。" + urls.Count);
+
+                onprecessStatu("创建队列 开始于" + x1 + "X" + y1);
+                Zoom zm = zoomlevel.GetLevel(_zoom, _mt);
+                if (endx > zm.maxX || endy > zm.maxY)
                 {
                     return;
                 }
@@ -35,64 +91,109 @@ namespace MyMap.ToolHelper
                 int partnum = 0;
                 string partDoc = "";
                 urls.Clear();
-                for (int x = x1; x <= x2; x++)
+           
+                for (int x = 0; x <= endx; x++)
                 {
-                    for (int y = y1; y <= y2; y++)
+                    if (x1 > -1)
                     {
-                        url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
-                        DownModel dm = new DownModel();
-                        dm.Url = url;
-
-                        partnum = (int)Math.Floor((double)((double)(x + 1) * (double)(zm.maxY + 1) / 1000));//计算分部文件夹编号
-
-
-                        partDoc = directorypath + "/" + zoom + "/" + zoom + "_" + partnum;
-                        if (!Directory.Exists(partDoc))
+                        x = x1;
+                        x1 = -1;
+                    }
+                    
+                    for (int y = 0; y <= endy; y++)
+                    {
+                        if (y1 > -1)
                         {
-                            Directory.CreateDirectory(partDoc);
+                            y = y1+1;
+                            y1 = -1;
                         }
+                        if (x >= _startx && y >= _starty)
+                        {
+                            _startx = 0;
+                            _starty = 0;
+                            url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
+                            DownModel dm = new DownModel();
+                            dm.Url = url;
 
-                        dm.Fielname = partDoc + "/" + zoom + "_" + x + "_" + y + ".png";
-                        urls.Enqueue(dm);
+                            dm.x = x;
+                            dm.y = y;
+                            partnum = (int)Math.Floor((double)((double)(x + 1) * (double)(zm.maxY + 1) / 1000));
+                            //计算分部文件夹编号
+
+
+                            partDoc = saveInfo.savepath + "/" + _zoom + "/" + _zoom + "_" + partnum;
+                            if (!Directory.Exists(partDoc))
+                            {
+                                Directory.CreateDirectory(partDoc);
+                            }
+
+                            dm.Fielname = partDoc + "/" + _zoom + "_" + x + "_" + y + ".png";
+                            urls.Enqueue(dm);
+                            if (urls.Count > 100 && isRun == false)
+                            {
+                                BeginDown();
+                            }
+                            if (urls.Count > 1000)
+                            {
+                                passx = x;
+                                passy = y;
+
+                                onprecessStatu("队列 " + urls.Count + " 停止入列。" + passx + "X" + passy);
+                                Create(new { x1 = passx, y1 = passy });
+                            }
+                        }
                     }
                 }
-
-
-                if (urls.Count > 0)
-                {
-                    downcount = 0;
-                    isRun = true;
-                    for (int i = 0; i < threadnumber; i++)
-                    {
-                        NextQuery();
-                    }
-
-                    //webClient.DownloadDataAsync(uri,dm);
-                    //MemoryStream ms = DoRequest(uri, dm);
-                }
-            });
-
-            t.Start();
-
+            }
+            else
+            {
+                Thread.Sleep(1000);
+                Create(new { x1 = passx, y1 = passy });
+            }
         }
+
+        public void BeginDown()
+        {
+            if (urls.Count > 0)
+            {
+                downcount = 0;
+                isRun = true;
+                for (int i = 0; i < threacount; i++)
+                {
+                    NextQuery();
+                }
+
+                //webClient.DownloadDataAsync(uri,dm);
+                //MemoryStream ms = DoRequest(uri, dm);
+            }
+        }
+
 
         public void DownStop()
         {
-            isRun = false;
+            //isRun = false;
+            lock (urls)
+            {
+                urls.Clear();
+            }
         }
         void NextQuery()
         {
             DownModel dm = urls.Dequeue();
-            Uri uri = new Uri(dm.Url);
-            WebClient webClient = GetWebClient();
-            webClient.DownloadFileAsync(uri, dm.Fielname, dm);
-            //   Task t = new Task(() =>
-            //   {
+            if (dm != null)
+            {
+                Uri uri = new Uri(dm.Url);
+                WebClient webClient = GetWebClient();
+                webClient.DownloadFileAsync(uri, dm.Fielname, dm);
+                //   Task t = new Task(() =>
+                //   {
 
-            //   }
-            //);
+                //   }
+                //);
 
-            //   t.Start();
+                //   t.Start();
+            }
+
 
         }
 
@@ -103,57 +204,111 @@ namespace MyMap.ToolHelper
             //webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
             if (e.Error == null)
             {
+            }
+            else
+            {
+                DownModel dm = (DownModel)e.UserState;
+                OnPrecessStatuEvent("错误。" + e.Error.Message + " " + dm.Url);
+                errdm.Add(dm);
+            }
 
-                downcount++;
-                if (downcount%20 == 0)
+            downcount++;
+            if (downcount % 20 == 0)
+            {
+                if (downcount % 500 == 0)
                 {
-                        OnPrecessEvent(downcount);
-                }
-            
-                if (!isRun)
-                {
-                    //完成下载 触发事件
-                    if (allThreadNumber > 0)
+                    DownModel dm = (DownModel)e.UserState;
+                    if (dm.x > saveInfo.stopx)
                     {
-                        allThreadNumber--;
+                        saveInfo.stopx = dm.x;
                     }
-                    if (allThreadNumber == 0)
+                    if (dm.y > saveInfo.stopy)
                     {
-                        OnCompleteEvent(downcount);
+                        saveInfo.stopy = dm.y;
+                    }
+                    File.WriteAllText(saveInfo.savepath + "/saveinfo.inf",
+                                       saveInfo.level + "," + saveInfo.stopx + "," + saveInfo.stopy);
+                }
 
-                    }
-                }
-                else
+                OnPrecessEvent(downcount);
+            }
+
+            //完成下载 触发事件
+            if (urls.Count > 0)
+            {
+                NextQuery();
+            }
+            else
+            {
+                lock (tc)
                 {
-                    if (urls.Count > 0)
+
+
+                    if (tc.allThreadNumber > 0)
                     {
-                        NextQuery();
-                    }
-                    else
-                    {
-                        //完成下载 触发事件
-                        if (allThreadNumber > 0)
+                        tc.allThreadNumber--;
+                        OnPrecessStatuEvent("线程完成 剩余:" + tc.allThreadNumber);
+                        DownModel dm = (DownModel)e.UserState;
+                        if (dm.x > saveInfo.stopx)
                         {
-                            allThreadNumber--;
+                            saveInfo.stopx = dm.x;
                         }
-                        if (allThreadNumber == 0)
+                        if (dm.y > saveInfo.stopy)
                         {
+                            saveInfo.stopy = dm.y;
+                        }
+
+                        if (tc.allThreadNumber == 0)
+                        {
+                            OnPrecessStatuEvent("线程全部完成 触发完成事件");
+                            isRun = false;
+                            File.WriteAllText(saveInfo.savepath + "/saveinfo.inf",
+                                saveInfo.level + "," + saveInfo.stopx + "," + saveInfo.stopy);
                             OnCompleteEvent(downcount);
                         }
                     }
                 }
 
             }
-            else
-            {
-                errdm.Add((DownModel)e.UserState);
-            }
+            //}
+            //else
+            //{
+            //    lock (tc)
+            //    {
+            //        if (tc.allThreadNumber > 0)
+            //        {
+            //            tc.allThreadNumber--;
+            //            OnPrecessStatuEvent("线程完成 剩余:" + tc.allThreadNumber);
+            //            DownModel dm = (DownModel)e.UserState;
+            //            if (dm.x > saveInfo.stopx)
+            //            {
+            //                saveInfo.stopx = dm.x;
+            //            }
+            //            if (dm.y > saveInfo.stopy)
+            //            {
+            //                saveInfo.stopy = dm.y;
+            //            }
+
+            //            if (tc.allThreadNumber == 0)
+            //            {
+            //                OnPrecessStatuEvent("线程全部完成 触发完成事件");
+            //                isRun = false;
+            //                File.WriteAllText(saveInfo.savepath + "/saveinfo.inf",
+            //                    saveInfo.level + "," + saveInfo.stopx + "," + saveInfo.stopy);
+            //                OnCompleteEvent(downcount);
+            //            }
+            //        }
+            //    }
+
+            //}
+
+
         }
 
         void webClient_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
         {
             WebClient webClient = (WebClient)sender;
-           
+
             webClient.DownloadDataCompleted -= webClient_DownloadDataCompleted;
             webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
             if (e.Error == null)
@@ -239,7 +394,8 @@ namespace MyMap.ToolHelper
         {
             if (oncomplete != null)
             {
-                oncomplete(AllCompleteCount);
+                oncomplete.Invoke(AllCompleteCount);
+                //oncomplete(AllCompleteCount);
             }
         }
 
@@ -255,6 +411,19 @@ namespace MyMap.ToolHelper
                 onprecess(precesspart);
             }
         }
+
+        public delegate void OnPrecessStatu(string statu);
+
+        public event OnPrecessStatu onprecessStatu;
+
+        public void OnPrecessStatuEvent(string statu)
+        {
+            if (onprecess != null)
+            {
+                onprecessStatu(statu);
+            }
+        }
+
         #endregion
 
 

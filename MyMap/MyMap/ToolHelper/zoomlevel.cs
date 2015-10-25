@@ -7,40 +7,51 @@ namespace MyMap.ToolHelper
 {
     public static class zoomlevel
     {
-        private static List<Zoom> zooms1 = new List<Zoom>()
-        {
-new Zoom(){level=4,maxX=15,maxY=15},
-new Zoom(){level=5,maxX=31,maxY=31},
-new Zoom(){level=6,maxX=63,maxY=63},
-new Zoom(){level=7,maxX=127,maxY=127},
-new Zoom(){level=8,maxX=255,maxY=255},
-new Zoom(){level=9,maxX=511,maxY=511},
-new Zoom(){level=10,maxX=1023,maxY=1023},
-new Zoom(){level=11,maxX=2047,maxY=2047},
-new Zoom(){level=12,maxX=4095,maxY=4095},
-new Zoom(){level=13,maxX=8191,maxY=8191},
-new Zoom(){level=14,maxX=16383,maxY=16383},
-new Zoom(){level=15,maxX=32767,maxY=32767},
-new Zoom(){level=16,maxX=65535,maxY=65535},
-new Zoom(){level=17,maxX=131071,maxY=131071},
-new Zoom(){level=18,maxX=262143,maxY=262143},
-new Zoom(){level=19,maxX=524287,maxY=524287},
-new Zoom(){level=20,maxX=1048575,maxY=1048575},
-new Zoom(){level=21,maxX=2097151,maxY=2097151},
-
-        };
-
-
-
-        public static Zoom GetLevel(int zoom)
+        public static Zoom GetLevel(int zoom,MapType mt)
         {
 
             string url1 = "http://mt0.google.cn/vt?pb=!1m4!1m3!1i@Z!2i@X!3i@Y!2m3!1e0!2sm!3i323191379!3m9!2szh-Hans-CN!3sCN!5e78!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!4e0";
-            string ull2 = "http://mt1.google.cn/vt?pb=!1m4!1m3!1i@Z!2i@X!3i@Y!2m3!1e0!2sm!3i323000000!3m9!2szh-Hans-CN!3sCN!5e78!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!4e0";
-            Zoom zm = zooms1.Find(z => z.level == zoom);
+           //平面地图
+            string url2 = "http://mt1.google.cn/vt?pb=!1m4!1m3!1i@Z!2i@X!3i@Y!2m3!1e0!2sm!3i323000000!3m9!2szh-Hans-CN!3sCN!5e78!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!4e0";
+           //卫星地图
+            string url3 = "http://mt0.google.cn/vt?lyrs=s@186&hl=zh-Hans-CN&gl=CN&x=@X&y=@Y&z=@Z&token=94681";
+                         //http://mt0.google.cn/vt?lyrs=s@186&hl=zh-Hans-CN&gl=CN&x=210&y=98&z=8&token=94681
+            //卫星地图线路
+            string url4 = "http://mt0.google.cn/vt?pb=!1m5!1m4!1i@Z!2i@X!3i@Y!4i256!2m3!1e0!2sm!3i325000000!3m9!2szh-Hans-CN!3sCN!5e78!12m1!1e50!12m3!1e37!2m1!1ssmartmaps!4e0";
+            //地形图
+            string url5 =
+                "http://mt1.google.cn/vt?pb=!1m5!1m4!1i@Z!2i@X!3i@Y!4i256!2m3!1e4!2st!3i132!2m3!1e0!2sr!3i325150060!3m9!2szh-Hans-CN!3sCN!5e78!12m1!1e63!12m3!1e37!2m1!1ssmartmaps!4e0";
+            //Zoom zm = zooms1.Find(z => z.level == zoom);
+
+            string url = url2;
+            switch (mt)
+            {
+                case MapType.pm:
+                {
+                    url = url2;
+                }
+                    break;
+                case MapType.wx:
+                    {
+                        url = url3;
+                    }
+                    break;
+                case MapType.wxxl:
+                    {
+                        url = url4;
+                    }
+                    break;
+                case MapType.dx:
+                    {
+                        url = url5;
+                    }
+                    break;
+            }
+            
+            Zoom zm=new Zoom(){level = zoom,maxX = (int)Math.Pow(2,zoom)-1,maxY = (int)Math.Pow(2,zoom)-1};
             if (zm != null)
             {
-                zm.url = ull2.Replace("@Z", zoom.ToString());
+                zm.url = url.Replace("@Z", zoom.ToString());
                 return zm;
             }
             return null;
@@ -55,5 +66,27 @@ new Zoom(){level=21,maxX=2097151,maxY=2097151},
         public int maxX { get; set; }
         public int maxY { get; set; }
         public string url { get; set; }
+    }
+
+
+    public enum MapType
+    {
+        /// <summary>
+        /// 平面图
+        /// </summary>
+        pm=0,
+        /// <summary>
+        /// 卫星图
+        /// </summary>
+        wx=1,
+        /// <summary>
+        /// 卫星线路
+        /// </summary>
+        wxxl=2,
+        /// <summary>
+        /// 地形图
+        /// </summary>
+        dx=3
+
     }
 }

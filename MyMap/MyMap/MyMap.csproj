@@ -55,6 +55,7 @@
     </ApplicationDefinition>
     <Compile Include="ToolHelper\DownModel.cs" />
     <Compile Include="ToolHelper\DownTool.cs" />
+    <Compile Include="ToolHelper\SaveInfo.cs" />
     <Compile Include="ToolHelper\TMS.cs" />
     <Compile Include="ToolHelper\zoomlevel.cs" />
     <Compile Include="WindowDownMap\WinDownGoogle.xaml.cs">

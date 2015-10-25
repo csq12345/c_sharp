@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -272,8 +273,7 @@ namespace ToMyHeart
 
                         System.Drawing.Image img = System.Drawing.Image.FromFile(imagepath);
                         Graphics gra = Graphics.FromImage(bitmap);
-
-
+                       
                         for (int i = 0; i < datas.Count; i++)
                         {
 
