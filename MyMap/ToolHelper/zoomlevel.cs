@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MyMap.ToolHelper
+namespace ToolHelper
 {
     public static class zoomlevel
     {
@@ -14,8 +14,9 @@ namespace MyMap.ToolHelper
            //平面地图
             string url2 = "http://mt1.google.cn/vt?pb=!1m4!1m3!1i@Z!2i@X!3i@Y!2m3!1e0!2sm!3i323000000!3m9!2szh-Hans-CN!3sCN!5e78!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!4e0";
            //卫星地图
-            string url3 = "http://mt0.google.cn/vt?lyrs=s@186&hl=zh-Hans-CN&gl=CN&x=@X&y=@Y&z=@Z&token=94681";
-                         //http://mt0.google.cn/vt?lyrs=s@186&hl=zh-Hans-CN&gl=CN&x=210&y=98&z=8&token=94681
+            string url3 = "http://mt0.google.cn/vt?lyrs=s@186&hl=zh-Hans-CN&gl=CN&x=@X&y=@Y&z=@Z";
+                         
+            //http://mt0.google.cn/vt?lyrs=s@186&hl=zh-Hans-CN&gl=CN&x=210&y=98&z=8&token=94681
             //卫星地图线路
             string url4 = "http://mt0.google.cn/vt?pb=!1m5!1m4!1i@Z!2i@X!3i@Y!4i256!2m3!1e0!2sm!3i325000000!3m9!2szh-Hans-CN!3sCN!5e78!12m1!1e50!12m3!1e37!2m1!1ssmartmaps!4e0";
             //地形图

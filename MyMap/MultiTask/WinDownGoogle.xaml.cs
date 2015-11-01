@@ -1,8 +1,10 @@
-﻿using MyMap.ToolHelper;
+﻿
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,8 +13,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ToolHelper;
 
-namespace MyMap.WindowDownMap
+namespace MultiTask
 {
     /// <summary>
     /// DownGoogle.xaml 的交互逻辑
@@ -21,6 +24,11 @@ namespace MyMap.WindowDownMap
     {
         private bool isrun = false;
         private DownTool downTool;
+        /// <summary>
+        ///是否是其他进程启动的
+        /// </summary>
+        bool isotherRun = false;
+
         public WinDownGoogle()
         {
             InitializeComponent();
@@ -33,13 +41,31 @@ namespace MyMap.WindowDownMap
 
             ComboBoxMapType.DisplayMemberPath = "name";
             ComboBoxMapType.SelectedValuePath = "value";
-            ComboBoxMapType.Items.Add(new {name = "平面", value = MapType.pm});
+            ComboBoxMapType.Items.Add(new { name = "平面", value = MapType.pm });
             ComboBoxMapType.Items.Add(new { name = "卫星", value = MapType.wx });
             ComboBoxMapType.Items.Add(new { name = "地形", value = MapType.dx });
             ComboBoxMapType.SelectedIndex = 0;
             downTool.oncomplete += downTool_oncomplete;
             downTool.onprecess += downTool_onprecess;
             downTool.onprecessStatu += downTool_onprecessStatu;
+
+            //获取开始截止参数
+            string[] args = System.Environment.GetCommandLineArgs();
+            Title = string.Join(",", args);
+            if (args.Count() == 9)
+            {
+                TextBoxX1.Text = args[1];
+                TextBoxX2.Text = args[2];
+                TextBoxY1.Text = args[3];
+                TextBoxY2.Text = args[4];
+
+                TextBoxSatrtx.Text = args[5];
+                TextBoxEndx.Text = args[6];
+                TextBoxStarty.Text = args[7];
+                TextBoxEndy.Text = args[8];
+                isotherRun = true;
+                ButtonStartTasks.IsEnabled = false;
+            }
         }
 
         void downTool_onprecessStatu(string statu)
@@ -70,7 +96,7 @@ namespace MyMap.WindowDownMap
 
 
 
-                int x1 = 0, x2 = 0, y1 = 0, y2 = 0, zoom = 0, t = 1, sx = 0, sy = 0;
+                int x1 = 0, x2 = 0, y1 = 0, y2 = 0, zoom = 0, t = 1, sx = 0, sy = 0, ex = 0, ey = 0;
 
                 int.TryParse(TextBoxX1.Text, out x1);
                 int.TryParse(TextBoxX2.Text, out x2);
@@ -78,11 +104,15 @@ namespace MyMap.WindowDownMap
                 int.TryParse(TextBoxY2.Text, out y2);
                 int.TryParse(TextBoxSatrtx.Text, out sx);
                 int.TryParse(TextBoxStarty.Text, out sy);
+
+                int.TryParse(TextBoxEndx.Text, out ex);
+                int.TryParse(TextBoxEndy.Text, out ey);
+
                 int.TryParse(TextBoxThreadNum.Text, out t);
                 TextBoxAll.Text = ((x2 - x1 + 1) * (y2 - y1 + 1)).ToString();
                 zoom = int.Parse(ComboBoxZoom.SelectedItem.ToString());
                 MapType maptype = (MapType)ComboBoxMapType.SelectedValue;
-                downTool.DownStart(maptype, x1, x2, y1, y2, zoom, "D:/temp/googlepic", t, sx, sy);
+                downTool.DownStart(maptype, x1, x2, y1, y2, zoom, "D:/temp/googlepic", t, sx, sy, ex, ey);
 
                 isrun = true;
                 ButtonSS.Content = "停止";
@@ -110,8 +140,19 @@ namespace MyMap.WindowDownMap
             ButtonSS.Dispatcher.BeginInvoke(new Action(() =>
             {
                 ButtonSS.Content = "开始";
+                if (isotherRun)
+                {
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(this, "完成下载：" + AllCompleteCount + " 错误:" + downTool.errdm.Count);
+
+
+                }
             }));
-            MessageBox.Show("完成下载：" + AllCompleteCount + " 错误:" + downTool.errdm.Count);
+
+
         }
 
         private void ComboBoxZoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -175,8 +216,8 @@ namespace MyMap.WindowDownMap
             int.TryParse(TextBoxSatrtx.Text, out sx);
             int.TryParse(TextBoxStarty.Text, out sy);
 
-            TextBoxAll.Text = ((x2 - x1 + 1) * (y2 - y1 + 1)
-                - ((sx - x1) * (y2 - y1 + 1) + (sy - y1))).ToString();
+
+            TextBoxAll.Text = downTool.GetDownSize(x1, x2, y1, y2, sx, sy).ToString();
         }
 
         private void ButtonConvertToxy_OnClick(object sender, RoutedEventArgs e)
@@ -184,28 +225,80 @@ namespace MyMap.WindowDownMap
             double x = 0, y = 0;
             int z = 0;
             int.TryParse(ComboBoxZoom.SelectedItem.ToString(), out z);
-          
+
             double.TryParse(TextBoxStartLatitute.Text, out x);
             double.TryParse(TextBoxStartLongitute.Text, out y);
-           
+
             int bx = (int)TMS.LongitudeToBlock(x, z);
             int by = (int)TMS.LatitudeToBlock(y, z);
 
             TextBoxX1.Text = bx.ToString();
             TextBoxY2.Text = by.ToString();
 
-           
+
             double.TryParse(TextBoxEndLatitute.Text, out x);
             double.TryParse(TextBoxEndLongitute.Text, out y);
 
-             bx = (int)TMS.LongitudeToBlock(x, z);
-             by = (int)TMS.LatitudeToBlock(y, z);
+            bx = (int)TMS.LongitudeToBlock(x, z);
+            by = (int)TMS.LatitudeToBlock(y, z);
 
-             TextBoxX2.Text = bx.ToString();
-             TextBoxY1.Text = by.ToString();
+            TextBoxX2.Text = bx.ToString();
+            TextBoxY1.Text = by.ToString();
 
-             TextBoxSatrtx.Text = TextBoxX1.Text;
+            TextBoxSatrtx.Text = TextBoxX1.Text;
             TextBoxStarty.Text = TextBoxY1.Text;
+        }
+
+        private void ButtonStartTasks_Click(object sender, RoutedEventArgs e)
+        {
+
+            int startx = 0, endx = 0, starty = 0, endy = 0, zoom = 0, t = 1, sx = 0, sy = 0;
+
+            int.TryParse(TextBoxX1.Text, out startx);
+            int.TryParse(TextBoxX2.Text, out endx);
+            int.TryParse(TextBoxY1.Text, out starty);
+            int.TryParse(TextBoxY2.Text, out endy);
+
+            int.TryParse(TextBoxSatrtx.Text, out sx);
+            int.TryParse(TextBoxStarty.Text, out sy);
+            int.TryParse(TextBoxThreadNum.Text, out t);
+
+            TextBoxAll.Text = ((endx - startx + 1) * (endy - starty + 1)).ToString();
+            zoom = int.Parse(ComboBoxZoom.SelectedItem.ToString());
+            MapType maptype = (MapType)ComboBoxMapType.SelectedValue;
+
+            Task task = new Task(() =>
+            {
+                int maxsize = 100;
+                int count = 0;
+
+                int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+                for (int x = startx; x <= endx; x++)
+                {
+                    for (int y = starty; y <= endy; y++)
+                    {
+                        if (count == 0)
+                        {
+                            x1 = x;
+                            y1 = y;
+                        }
+                        count++;
+                        if (count == maxsize || (x == endx && y == endy))
+                        {
+                            x2 = x;
+                            y2 = y;
+                            //启动一个任务
+                            Process p = new Process();
+                            ProcessStartInfo psi = new ProcessStartInfo("MultiTask.exe",
+                                startx + " " + endx + " " + starty + " " + endy + " " + x1 + " " + x2 + " " + y1 + " " + y2);
+                            p.StartInfo = psi;
+                            p.Start();
+                            count = 0;
+                        }
+                    }
+                }
+            });
+            task.Start();
         }
     }
 }

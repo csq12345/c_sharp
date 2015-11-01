@@ -1,4 +1,4 @@
-﻿<Window x:Class="MyMap.WindowDownMap.WinDownGoogle"
+﻿<Window x:Class="MultiTask.WinDownGoogle"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WinDownGoogle" Height="800" Width="600">
@@ -26,12 +26,15 @@
         <ComboBox Name="ComboBoxMapType"  HorizontalAlignment="Left" Margin="367,192,0,0" VerticalAlignment="Top" Width="71"/>
         <TextBox Name="TextBoxStartLatitute" HorizontalAlignment="Left" Height="23" Margin="84,30,0,0" TextWrapping="Wrap" Text="115.3" VerticalAlignment="Top" Width="120"/>
         <TextBox Name="TextBoxEndLatitute" HorizontalAlignment="Left" Height="23" Margin="84,58,0,0" TextWrapping="Wrap" Text="117.4" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxStartLongitute" HorizontalAlignment="Left" Height="23" Margin="228,30,0,0" TextWrapping="Wrap" Text="39.4" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxStartLongitute" HorizontalAlignment="Left" Height="23" Margin="228,30,0,0" TextWrapping="Wrap" Text="38.4" VerticalAlignment="Top" Width="120"/>
         <TextBox Name="TextBoxEndLongitute" HorizontalAlignment="Left" Height="23" Margin="228,58,0,0" TextWrapping="Wrap" Text="40.4" VerticalAlignment="Top" Width="120"/>
         <Label Content="经度范围" HorizontalAlignment="Left" Margin="84,4,0,0" VerticalAlignment="Top"/>
         <Label Content="维度范围" HorizontalAlignment="Left" Margin="228,4,0,0" VerticalAlignment="Top"/>
         <Button Name="ButtonConvertToxy" Content="输入下方" HorizontalAlignment="Left" Margin="367,42,0,0" VerticalAlignment="Top" Width="75" Click="ButtonConvertToxy_OnClick"/>
         <ListBox Name="ListBoxStatu" HorizontalAlignment="Left" Height="298" Margin="28,389,0,0" VerticalAlignment="Top" Width="301"/>
+        <Button Name="ButtonStartTasks" Content="开始多任务" HorizontalAlignment="Left" Margin="363,354,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.573,0.682" Click="ButtonStartTasks_Click"/>
+        <TextBox x:Name="TextBoxEndx" HorizontalAlignment="Left" Height="23" Margin="444,93,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
+        <TextBox x:Name="TextBoxEndy" HorizontalAlignment="Left" Height="23" Margin="444,137,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
 
     </Grid>
 </Window>

@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyMap", "MyMap\MyMap.csproj", "{D53875F2-26BB-4A9B-A5CD-DB7A7A0082D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTask", "MultiTask\MultiTask.csproj", "{0006BC25-0734-4A3B-801F-46E6EF1CDC14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolHelper", "ToolHelper\ToolHelper.csproj", "{86563ED7-5843-418B-BFB6-9E7E3AD35676}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{D53875F2-26BB-4A9B-A5CD-DB7A7A0082D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D53875F2-26BB-4A9B-A5CD-DB7A7A0082D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D53875F2-26BB-4A9B-A5CD-DB7A7A0082D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0006BC25-0734-4A3B-801F-46E6EF1CDC14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0006BC25-0734-4A3B-801F-46E6EF1CDC14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0006BC25-0734-4A3B-801F-46E6EF1CDC14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0006BC25-0734-4A3B-801F-46E6EF1CDC14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86563ED7-5843-418B-BFB6-9E7E3AD35676}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86563ED7-5843-418B-BFB6-9E7E3AD35676}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86563ED7-5843-418B-BFB6-9E7E3AD35676}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86563ED7-5843-418B-BFB6-9E7E3AD35676}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
