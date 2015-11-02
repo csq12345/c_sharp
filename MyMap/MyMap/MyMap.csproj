@@ -99,10 +99,6 @@
       <Project>{0006bc25-0734-4a3b-801f-46e6ef1cdc14}</Project>
       <Name>MultiTask</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ToolHelper\ToolHelper.csproj">
-      <Project>{86563ed7-5843-418b-bfb6-9e7e3ad35676}</Project>
-      <Name>ToolHelper</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

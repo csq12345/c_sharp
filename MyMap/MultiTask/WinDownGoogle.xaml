@@ -1,40 +1,45 @@
 ﻿<Window x:Class="MultiTask.WinDownGoogle"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WinDownGoogle" Height="800" Width="600">
+        Title="WinDownGoogle" Height="497" Width="534">
     <Grid>
-        <Label Content="X范围" HorizontalAlignment="Left" Margin="24,93,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="TextBoxX1" HorizontalAlignment="Left" Height="23" Margin="84,93,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxX2" HorizontalAlignment="Left" Height="23" Margin="218,93,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <Label Content="Y范围" HorizontalAlignment="Left" Margin="24,137,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="TextBoxY1" HorizontalAlignment="Left" Height="23" Margin="84,137,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxY2" HorizontalAlignment="Left" Height="23" Margin="218,137,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <Button Name="ButtonSS" Content="开始" HorizontalAlignment="Left" Margin="254,353,0,0" VerticalAlignment="Top" Width="75" Click="ButtonSS_Click"/>
-        <Label Content="缩放[4,]" HorizontalAlignment="Left" Margin="24,188,0,0" VerticalAlignment="Top"/>
-        <ComboBox  Name="ComboBoxZoom" HorizontalAlignment="Left" Margin="84,192,0,0" VerticalAlignment="Top" Width="44" SelectionChanged="ComboBoxZoom_SelectionChanged"/>
-        <TextBox Name="TextBoxcompletecount" HorizontalAlignment="Left" Height="23" Margin="134,192,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
-        <TextBox Name="TextBoxAll" HorizontalAlignment="Left" Height="23" Margin="240,192,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
-        <TextBox x:Name="TextBoxLatitude" HorizontalAlignment="Left" Height="23" Margin="24,283,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="TextBoxLongitude" HorizontalAlignment="Left" Height="23" Margin="24,255,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="ButtonConvertBlock" Content="换算成图块" HorizontalAlignment="Left" Margin="164,267,0,0" VerticalAlignment="Top" Width="75" Click="ButtonConvertBlock_Click"/>
-        <TextBox x:Name="TextBoxX" HorizontalAlignment="Left" Height="23" Margin="254,255,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="TextBoxY" HorizontalAlignment="Left" Height="23" Margin="254,283,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
-        <Button Name="ButtonReady" Content="估算" HorizontalAlignment="Left" Margin="273,220,0,0" VerticalAlignment="Top" Width="75" Click="ButtonReady_Click"/>
-        <TextBox Name="TextBoxThreadNum" HorizontalAlignment="Left" Height="23" Margin="184,353,0,0" TextWrapping="Wrap" Text="5" VerticalAlignment="Top" Width="55"/>
-        <TextBox Name="TextBoxSatrtx" HorizontalAlignment="Left" Height="23" Margin="352,93,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
-        <TextBox Name="TextBoxStarty" HorizontalAlignment="Left" Height="23" Margin="352,137,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
-        <ComboBox Name="ComboBoxMapType"  HorizontalAlignment="Left" Margin="367,192,0,0" VerticalAlignment="Top" Width="71"/>
-        <TextBox Name="TextBoxStartLatitute" HorizontalAlignment="Left" Height="23" Margin="84,30,0,0" TextWrapping="Wrap" Text="115.3" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxEndLatitute" HorizontalAlignment="Left" Height="23" Margin="84,58,0,0" TextWrapping="Wrap" Text="117.4" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxStartLongitute" HorizontalAlignment="Left" Height="23" Margin="228,30,0,0" TextWrapping="Wrap" Text="38.4" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="TextBoxEndLongitute" HorizontalAlignment="Left" Height="23" Margin="228,58,0,0" TextWrapping="Wrap" Text="40.4" VerticalAlignment="Top" Width="120"/>
-        <Label Content="经度范围" HorizontalAlignment="Left" Margin="84,4,0,0" VerticalAlignment="Top"/>
-        <Label Content="维度范围" HorizontalAlignment="Left" Margin="228,4,0,0" VerticalAlignment="Top"/>
-        <Button Name="ButtonConvertToxy" Content="输入下方" HorizontalAlignment="Left" Margin="367,42,0,0" VerticalAlignment="Top" Width="75" Click="ButtonConvertToxy_OnClick"/>
-        <ListBox Name="ListBoxStatu" HorizontalAlignment="Left" Height="298" Margin="28,389,0,0" VerticalAlignment="Top" Width="301"/>
-        <Button Name="ButtonStartTasks" Content="开始多任务" HorizontalAlignment="Left" Margin="363,354,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.573,0.682" Click="ButtonStartTasks_Click"/>
-        <TextBox x:Name="TextBoxEndx" HorizontalAlignment="Left" Height="23" Margin="444,93,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
-        <TextBox x:Name="TextBoxEndy" HorizontalAlignment="Left" Height="23" Margin="444,137,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
+        <Label Content="X范围" HorizontalAlignment="Left" Margin="4,83,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="TextBoxX1" HorizontalAlignment="Left" Height="23" Margin="51,83,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxX2" HorizontalAlignment="Left" Height="23" Margin="185,83,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Y范围" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="TextBoxY1" HorizontalAlignment="Left" Height="23" Margin="51,127,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxY2" HorizontalAlignment="Left" Height="23" Margin="185,127,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Button Name="ButtonSS" Content="开始" HorizontalAlignment="Left" Margin="442,198,0,0" VerticalAlignment="Top" Width="75" Click="ButtonSS_Click"/>
+        <Label Content="缩放[4,]" HorizontalAlignment="Left" Margin="7,160,0,0" VerticalAlignment="Top"/>
+        <ComboBox  Name="ComboBoxZoom" HorizontalAlignment="Left" Margin="67,164,0,0" VerticalAlignment="Top" Width="44" SelectionChanged="ComboBoxZoom_SelectionChanged"/>
+        <TextBox Name="TextBoxcompletecount" HorizontalAlignment="Left" Height="23" Margin="117,164,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
+        <TextBox Name="TextBoxAll" HorizontalAlignment="Left" Height="23" Margin="223,164,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
+        <TextBox x:Name="TextBoxLatitude" HorizontalAlignment="Left" Height="23" Margin="14,226,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TextBoxLongitude" HorizontalAlignment="Left" Height="23" Margin="14,198,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="ButtonConvertBlock" Content="换算成图块" HorizontalAlignment="Left" Margin="154,210,0,0" VerticalAlignment="Top" Width="75" Click="ButtonConvertBlock_Click"/>
+        <TextBox x:Name="TextBoxX" HorizontalAlignment="Left" Height="23" Margin="244,198,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="TextBoxY" HorizontalAlignment="Left" Height="23" Margin="244,226,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
+        <Button Name="ButtonReady" Content="估算" HorizontalAlignment="Left" Margin="328,164,0,0" VerticalAlignment="Top" Width="75" Click="ButtonReady_Click"/>
+        <TextBox Name="TextBoxThreadNum" HorizontalAlignment="Left" Height="23" Margin="382,198,0,0" TextWrapping="Wrap" Text="5" VerticalAlignment="Top" Width="55"/>
+        <TextBox Name="TextBoxSatrtx" HorizontalAlignment="Left" Height="23" Margin="319,83,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
+        <TextBox Name="TextBoxStarty" HorizontalAlignment="Left" Height="23" Margin="319,127,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
+        <ComboBox Name="ComboBoxMapType"  HorizontalAlignment="Left" Margin="411,164,0,0" VerticalAlignment="Top" Width="71"/>
+        <TextBox Name="TextBoxStartLatitute" HorizontalAlignment="Left" Height="23" Margin="51,28,0,0" TextWrapping="Wrap" Text="115.3" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxEndLatitute" HorizontalAlignment="Left" Height="23" Margin="51,56,0,0" TextWrapping="Wrap" Text="117.4" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxStartLongitute" HorizontalAlignment="Left" Height="23" Margin="195,28,0,0" TextWrapping="Wrap" Text="38.4" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="TextBoxEndLongitute" HorizontalAlignment="Left" Height="23" Margin="195,56,0,0" TextWrapping="Wrap" Text="40.4" VerticalAlignment="Top" Width="120"/>
+        <Label Content="经度范围" HorizontalAlignment="Left" Margin="51,2,0,0" VerticalAlignment="Top"/>
+        <Label Content="维度范围" HorizontalAlignment="Left" Margin="195,2,0,0" VerticalAlignment="Top"/>
+        <Button Name="ButtonConvertToxy" Content="输入下方" HorizontalAlignment="Left" Margin="334,40,0,0" VerticalAlignment="Top" Width="75" Click="ButtonConvertToxy_OnClick"/>
+        <ListBox Name="ListBoxStatu" HorizontalAlignment="Left" Height="204" Margin="16,259,0,0" VerticalAlignment="Top" Width="495"/>
+        <Button Name="ButtonStartTasks" HorizontalAlignment="Left" Margin="369,222,0,0" VerticalAlignment="Top" Width="150" RenderTransformOrigin="0.573,0.682" Click="ButtonStartTasks_Click">
+            <StackPanel Orientation="Horizontal">
+                <TextBox Name="TextBoxTaskNumber" Width="70" Text="10"></TextBox>
+                <Label>开始多任务</Label>
+            </StackPanel>
+        </Button>
+        <TextBox x:Name="TextBoxEndx" HorizontalAlignment="Left" Height="23" Margin="411,83,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
+        <TextBox x:Name="TextBoxEndy" HorizontalAlignment="Left" Height="23" Margin="411,127,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
 
     </Grid>
 </Window>

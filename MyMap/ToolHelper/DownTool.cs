@@ -300,6 +300,8 @@ namespace ToolHelper
                      //webClient.DownloadDataAsync(uri,dm);
                      //MemoryStream ms = DoRequest(uri, dm);
                  }
+
+              
              }
           );
 
@@ -315,7 +317,7 @@ namespace ToolHelper
                 urls.Clear();
             }
         }
-        void NextQuery()
+        bool NextQuery()
         {
             DownModel dm = urls.Dequeue();
             if (dm != null)
@@ -323,6 +325,7 @@ namespace ToolHelper
                 Uri uri = new Uri(dm.Url);
                 WebClient webClient = GetWebClient();
                 webClient.DownloadFileAsync(uri, dm.Fielname, dm);
+                return true;
                 //   Task t = new Task(() =>
                 //   {
 
@@ -331,7 +334,7 @@ namespace ToolHelper
 
                 //   t.Start();
             }
-
+            return false;
 
         }
 
@@ -372,16 +375,14 @@ namespace ToolHelper
             }
 
             //完成下载 触发事件
-            if (urls.Count > 0)
+            if (urls.Count > 0&&NextQuery())
             {
-                NextQuery();
+                
             }
             else
             {
                 lock (tc)
                 {
-
-
                     if (tc.allThreadNumber > 0)
                     {
                         tc.allThreadNumber--;
@@ -404,6 +405,10 @@ namespace ToolHelper
                                 saveInfo.level + "," + saveInfo.stopx + "," + saveInfo.stopy);
                             OnCompleteEvent(downcount);
                         }
+                    }
+                    else
+                    {
+                        OnPrecessStatuEvent("线程全部完成");
                     }
                 }
 
