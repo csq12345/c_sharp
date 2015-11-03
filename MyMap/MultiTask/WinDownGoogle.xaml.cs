@@ -29,6 +29,10 @@ namespace MultiTask
         /// </summary>
         bool isotherRun = false;
 
+        bool actionselectchange = true;
+
+        private int allcount = 0;
+
         public WinDownGoogle()
         {
             InitializeComponent();
@@ -51,9 +55,11 @@ namespace MultiTask
 
             //获取开始截止参数
             string[] args = System.Environment.GetCommandLineArgs();
-            Title = string.Join(",", args);
+            //Title = string.Join(",", args);
             if (args.Count() == 11)
             {
+                actionselectchange = false;
+
                 TextBoxX1.Text = args[1];
                 TextBoxX2.Text = args[2];
                 TextBoxY1.Text = args[3];
@@ -63,17 +69,48 @@ namespace MultiTask
                 TextBoxEndx.Text = args[6];
                 TextBoxStarty.Text = args[7];
                 TextBoxEndy.Text = args[8];
+
                 int si = 0;
                 int.TryParse(args[9], out si);
                 ComboBoxZoom.SelectedIndex = si;
+
+               
+
+
                 int mti = 0;
                 int.TryParse(args[10], out mti);
                 ComboBoxMapType.SelectedIndex = mti;
+
                 isotherRun = true;
                 ButtonStartTasks.IsEnabled = false;//禁用开始多任务按钮
 
-                ButtonReady_Click(null,null);//调用估算按钮
-                ButtonSS_Click(null, null);//调用开始按钮
+               
+                //ButtonSS_Click(null, null);//调用开始按钮
+
+
+                int x1 = 0, x2 = 0, y1 = 0, y2 = 0, zoom = 0, t = 1, sx = 0, sy = 0, ex = 0, ey = 0;
+
+                int.TryParse(TextBoxX1.Text, out x1);
+                int.TryParse(TextBoxX2.Text, out x2);
+                int.TryParse(TextBoxY1.Text, out y1);
+                int.TryParse(TextBoxY2.Text, out y2);
+                int.TryParse(TextBoxSatrtx.Text, out sx);
+                int.TryParse(TextBoxStarty.Text, out sy);
+
+                int.TryParse(TextBoxEndx.Text, out ex);
+                int.TryParse(TextBoxEndy.Text, out ey);
+
+                int.TryParse(TextBoxThreadNum.Text, out t);
+                allcount = ((x2 - x1 + 1) * (y2 - y1 + 1));
+                TextBoxAll.Text = allcount.ToString();
+                zoom = int.Parse(ComboBoxZoom.SelectedItem.ToString());
+
+                Labelzoom.Content = "[" + zoom + "]";
+
+                ButtonReady_Click(null, null);//调用估算按钮
+
+                MapType maptype = (MapType)ComboBoxMapType.SelectedValue;
+                StartDown(maptype, x1, x2, y1, y2, zoom, t, sx, sy, ex, ey);
             }
         }
 
@@ -117,12 +154,21 @@ namespace MultiTask
                 TextBoxAll.Text = ((x2 - x1 + 1) * (y2 - y1 + 1)).ToString();
                 zoom = int.Parse(ComboBoxZoom.SelectedItem.ToString());
                 MapType maptype = (MapType)ComboBoxMapType.SelectedValue;
-                downTool.DownStart(maptype, x1, x2, y1, y2, zoom, "D:/temp/googlepic", t, sx, sy, ex, ey);
+
+                StartDown(maptype, x1, x2, y1, y2, zoom, t, sx, sy, ex, ey);
 
                 isrun = true;
                 ButtonSS.Content = "停止";
             }
         }
+
+        void StartDown(MapType mt, int x1, int x2, int y1, int y2, int zoom, int threadnumber,
+            int passstartx, int passstarty, int passendx, int passendy)
+        {
+            downTool.DownStart(mt, x1, x2, y1, y2, zoom, "D:/temp/googlepic", threadnumber,
+                passstartx, passstarty, passendx, passendy);
+        }
+
 
         void downTool_onprecess(int AllCompleteCount)
         {
@@ -130,11 +176,16 @@ namespace MultiTask
         }
 
 
-        void SetProcessValue(int value)
+        private void SetProcessValue(int value)
         {
             TextBoxcompletecount.Dispatcher.BeginInvoke(new Action(
-                () => TextBoxcompletecount.Text = value.ToString()
-                )
+                () =>
+                {
+                    TextBoxcompletecount.Text = value.ToString();
+
+                    Title = (value*100/allcount) + "%";
+                }
+    )
                 , null
             );
         }
@@ -162,11 +213,15 @@ namespace MultiTask
 
         private void ComboBoxZoom_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            int z = (int)e.AddedItems[0];
-            Zoom zm = zoomlevel.GetLevel(z, MapType.pm);
-            TextBoxX2.Text = zm.maxX.ToString();
-            TextBoxY2.Text = zm.maxX.ToString();
-            TextBoxAll.Text = ((zm.maxX + 1) * (zm.maxY + 1)).ToString();
+            if (actionselectchange)
+            {
+                int z = (int)e.AddedItems[0];
+                Zoom zm = zoomlevel.GetLevel(z, MapType.pm);
+                TextBoxX2.Text = zm.maxX.ToString();
+                TextBoxY2.Text = zm.maxX.ToString();
+                TextBoxAll.Text = ((zm.maxX + 1) * (zm.maxY + 1)).ToString();
+            }
+
         }
 
         private void ButtonConvertBlock_Click(object sender, RoutedEventArgs e)
@@ -232,7 +287,8 @@ namespace MultiTask
                 ey = y2;
             }
             int endnum = downTool.GetDownSize(x1, x2, y1, y2, ex, ey);
-            TextBoxAll.Text = (startnum - endnum).ToString();
+            allcount = (startnum - endnum);
+            TextBoxAll.Text = allcount.ToString();
         }
 
         private void ButtonConvertToxy_OnClick(object sender, RoutedEventArgs e)
@@ -267,7 +323,7 @@ namespace MultiTask
         private void ButtonStartTasks_Click(object sender, RoutedEventArgs e)
         {
 
-            int startx = 0, endx = 0, starty = 0, endy = 0, zoom = 0, t = 1, sx = 0, sy = 0,ex=0,ey=0,tasknum=0;
+            int startx = 0, endx = 0, starty = 0, endy = 0, zoom = 0, t = 1, sx = 0, sy = 0, ex = 0, ey = 0, tasknum = 0;
 
             int.TryParse(TextBoxX1.Text, out startx);
             int.TryParse(TextBoxX2.Text, out endx);
@@ -276,7 +332,7 @@ namespace MultiTask
 
             int.TryParse(TextBoxSatrtx.Text, out sx);
             int.TryParse(TextBoxStarty.Text, out sy);
-            
+
             int.TryParse(TextBoxThreadNum.Text, out t);
 
             int.TryParse(TextBoxEndx.Text, out ex);
@@ -308,7 +364,7 @@ namespace MultiTask
             List<Process> processes = new List<Process>();
             Task task = new Task(() =>
             {
-                
+
                 int count = 0;
 
                 int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
@@ -332,7 +388,7 @@ namespace MultiTask
                                 startx + " " + endx + " " + starty + " " + endy + " " + x1 + " " + x2 + " " + y1 + " " + y2
                                 + " " + zoom + " " + maptypeindex);
                             p.StartInfo = psi;
-                            
+
                             processes.Add(p);
                             p.Start();
                             count = 0;

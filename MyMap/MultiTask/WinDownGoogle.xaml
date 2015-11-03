@@ -10,7 +10,7 @@
         <TextBox Name="TextBoxY1" HorizontalAlignment="Left" Height="23" Margin="51,127,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <TextBox Name="TextBoxY2" HorizontalAlignment="Left" Height="23" Margin="185,127,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="120"/>
         <Button Name="ButtonSS" Content="开始" HorizontalAlignment="Left" Margin="442,198,0,0" VerticalAlignment="Top" Width="75" Click="ButtonSS_Click"/>
-        <Label Content="缩放[4,]" HorizontalAlignment="Left" Margin="7,160,0,0" VerticalAlignment="Top"/>
+        <Label Name="Labelzoom" Content="[4]" HorizontalAlignment="Left" Margin="7,160,0,0" VerticalAlignment="Top"/>
         <ComboBox  Name="ComboBoxZoom" HorizontalAlignment="Left" Margin="67,164,0,0" VerticalAlignment="Top" Width="44" SelectionChanged="ComboBoxZoom_SelectionChanged"/>
         <TextBox Name="TextBoxcompletecount" HorizontalAlignment="Left" Height="23" Margin="117,164,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
         <TextBox Name="TextBoxAll" HorizontalAlignment="Left" Height="23" Margin="223,164,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="100"/>
