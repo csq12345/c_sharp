@@ -34,8 +34,8 @@
         <ListBox Name="ListBoxStatu" HorizontalAlignment="Left" Height="204" Margin="16,259,0,0" VerticalAlignment="Top" Width="495"/>
         <Button Name="ButtonStartTasks" HorizontalAlignment="Left" Margin="369,222,0,0" VerticalAlignment="Top" Width="150" RenderTransformOrigin="0.573,0.682" Click="ButtonStartTasks_Click">
             <StackPanel Orientation="Horizontal">
-                <TextBox Name="TextBoxTaskNumber" Width="70" Text="10"></TextBox>
-                <Label>开始多任务</Label>
+                <TextBox Name="TextBoxTaskNumber" Width="70" Text="6"></TextBox>
+                <Label Name="Labeltask">开始多任务</Label>
             </StackPanel>
         </Button>
         <TextBox x:Name="TextBoxEndx" HorizontalAlignment="Left" Height="23" Margin="411,83,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>

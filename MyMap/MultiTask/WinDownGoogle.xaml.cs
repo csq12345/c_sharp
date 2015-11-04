@@ -74,7 +74,7 @@ namespace MultiTask
                 int.TryParse(args[9], out si);
                 ComboBoxZoom.SelectedIndex = si;
 
-               
+
 
 
                 int mti = 0;
@@ -83,8 +83,9 @@ namespace MultiTask
 
                 isotherRun = true;
                 ButtonStartTasks.IsEnabled = false;//禁用开始多任务按钮
+                ComboBoxZoom.IsEnabled = false;
+                ButtonSS.IsEnabled = false;
 
-               
                 //ButtonSS_Click(null, null);//调用开始按钮
 
 
@@ -183,7 +184,7 @@ namespace MultiTask
                 {
                     TextBoxcompletecount.Text = value.ToString();
 
-                    Title = (value*100/allcount) + "%";
+                    Title = (value * 100 / allcount) + "%";
                 }
     )
                 , null
@@ -319,90 +320,125 @@ namespace MultiTask
             TextBoxSatrtx.Text = TextBoxX1.Text;
             TextBoxStarty.Text = TextBoxY1.Text;
         }
-
+        List<Process> processes = new List<Process>();
+        private bool isrunmtask = false;
         private void ButtonStartTasks_Click(object sender, RoutedEventArgs e)
         {
-
-            int startx = 0, endx = 0, starty = 0, endy = 0, zoom = 0, t = 1, sx = 0, sy = 0, ex = 0, ey = 0, tasknum = 0;
-
-            int.TryParse(TextBoxX1.Text, out startx);
-            int.TryParse(TextBoxX2.Text, out endx);
-            int.TryParse(TextBoxY1.Text, out starty);
-            int.TryParse(TextBoxY2.Text, out endy);
-
-            int.TryParse(TextBoxSatrtx.Text, out sx);
-            int.TryParse(TextBoxStarty.Text, out sy);
-
-            int.TryParse(TextBoxThreadNum.Text, out t);
-
-            int.TryParse(TextBoxEndx.Text, out ex);
-            int.TryParse(TextBoxEndy.Text, out ey);
-
-            int.TryParse(TextBoxTaskNumber.Text, out tasknum);
-
-
-            int startnum = downTool.GetDownSize(startx, endx, starty, endy, sx, sy);
-            if (ex == 0)
-            {
-                ex = endx;
-            }
-            if (ey == 0)
-            {
-                ey = endy;
-            }
-            int endnum = downTool.GetDownSize(startx, endx, starty, endy, ex, ey);
-            TextBoxAll.Text = (startnum - endnum).ToString();
-
-            //TextBoxAll.Text = ((endx - startx + 1) * (endy - starty + 1)).ToString();
-            zoom = ComboBoxZoom.SelectedIndex;
-            int maptypeindex = ComboBoxMapType.SelectedIndex;
-
-
-            int maxsize = (startnum - endnum) / tasknum;
-
-
-            List<Process> processes = new List<Process>();
-            Task task = new Task(() =>
+            try
             {
 
-                int count = 0;
 
-                int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
-                for (int x = startx; x <= endx; x++)
+                if (!isrunmtask)
                 {
-                    for (int y = starty; y <= endy; y++)
+                    foreach (var item in processes)
                     {
-                        if (count == 0)
-                        {
-                            x1 = x;
-                            y1 = y;
-                        }
-                        count++;
-                        if (count == maxsize || (x == endx && y == endy))
-                        {
-                            x2 = x;
-                            y2 = y;
-                            //启动一个任务
-                            Process p = new Process();
-                            ProcessStartInfo psi = new ProcessStartInfo("MultiTask.exe",
-                                startx + " " + endx + " " + starty + " " + endy + " " + x1 + " " + x2 + " " + y1 + " " + y2
-                                + " " + zoom + " " + maptypeindex);
-                            p.StartInfo = psi;
-
-                            processes.Add(p);
-                            p.Start();
-                            count = 0;
-                        }
+                        item.Kill();
                     }
-                }
-                int procount = processes.Count;
+                    processes.Clear();
+                    int startx = 0, endx = 0, starty = 0, endy = 0, zoom = 0, t = 1, sx = 0, sy = 0, ex = 0, ey = 0, tasknum = 0;
 
-                //foreach (var item in processes)
-                //{
-                //    item.Start();
-                //}
-            });
-            task.Start();
+                    int.TryParse(TextBoxX1.Text, out startx);
+                    int.TryParse(TextBoxX2.Text, out endx);
+                    int.TryParse(TextBoxY1.Text, out starty);
+                    int.TryParse(TextBoxY2.Text, out endy);
+
+                    int.TryParse(TextBoxSatrtx.Text, out sx);
+                    int.TryParse(TextBoxStarty.Text, out sy);
+
+                    int.TryParse(TextBoxThreadNum.Text, out t);
+
+                    int.TryParse(TextBoxEndx.Text, out ex);
+                    int.TryParse(TextBoxEndy.Text, out ey);
+
+                    int.TryParse(TextBoxTaskNumber.Text, out tasknum);
+
+
+                    int startnum = downTool.GetDownSize(startx, endx, starty, endy, sx, sy);
+                    if (ex == 0)
+                    {
+                        ex = endx;
+                    }
+                    if (ey == 0)
+                    {
+                        ey = endy;
+                    }
+                    int endnum = downTool.GetDownSize(startx, endx, starty, endy, ex, ey);
+                    TextBoxAll.Text = (startnum - endnum).ToString();
+
+                    //TextBoxAll.Text = ((endx - startx + 1) * (endy - starty + 1)).ToString();
+                    zoom = ComboBoxZoom.SelectedIndex;
+                    int maptypeindex = ComboBoxMapType.SelectedIndex;
+
+
+                    int maxsize = (startnum - endnum) / tasknum;
+
+
+
+                    Task task = new Task(() =>
+                    {
+
+                        int count = 0;
+
+                        int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+                        for (int x = startx; x <= endx; x++)
+                        {
+                            for (int y = starty; y <= endy; y++)
+                            {
+                                if (count == 0)
+                                {
+                                    x1 = x;
+                                    y1 = y;
+                                }
+                                count++;
+                                if (count == maxsize || (x == endx && y == endy))
+                                {
+                                    x2 = x;
+                                    y2 = y;
+                                    //启动一个任务
+                                    Process p = new Process();
+                                    ProcessStartInfo psi = new ProcessStartInfo("MultiTask.exe",
+                                        startx + " " + endx + " " + starty + " " + endy + " " + x1 + " " + x2 + " " + y1 + " " + y2
+                                        + " " + zoom + " " + maptypeindex);
+                                    p.StartInfo = psi;
+                                    psi.WindowStyle=ProcessWindowStyle.Minimized;
+
+                                    processes.Add(p);
+                                    p.Start();
+                                    count = 0;
+                                }
+                            }
+                        }
+                        int procount = processes.Count;
+
+                        //foreach (var item in processes)
+                        //{
+                        //    item.Start();
+                        //}
+                    });
+                    task.Start();
+                    isrunmtask = true;
+                    Labeltask.Content = "停止进程";
+                }
+                else
+                {
+                    foreach (var item in processes)
+                    {
+                        if (!item.HasExited)
+                        {
+                           item.Kill();  
+                        }
+                       
+                    }
+                    processes.Clear();
+                    Labeltask.Content = "开始任务";
+                    isrunmtask = false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.StackTrace);
+            }
         }
     }
 }
