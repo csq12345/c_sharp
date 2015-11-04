@@ -65,7 +65,7 @@ namespace ToolHelper
             saveInfo = new SaveInfo() { level = zoom, stopx = 0, stopy = 0 };
             saveInfo.savepath = directorypath + "/" + (int)mt;
             threacount = threadnumber;
-            tc.allThreadNumber = threadnumber;
+
             _endx = endx;
             _endy = endy;
             _zoom = zoom;
@@ -207,7 +207,7 @@ namespace ToolHelper
 
                                 if (x == passendx && y == passendy)
                                 {
-                                    
+
                                 }
                                 if (x == passendx && y == passendy)
                                 {
@@ -235,8 +235,8 @@ namespace ToolHelper
                                         passstartx = x;
                                         passstarty = y;
                                         onprecessStatu("队列 " + urls.Count + " 停止入列。" + passstartx + "X" + passstarty + " 入列总数" + inputqueuecount);
-                                        x = endx+1;//设置x值大于截止值 则下次循环将不执行
-                                        y = endy+1;
+                                        x = endx + 1;//设置x值大于截止值 则下次循环将不执行
+                                        y = endy + 1;
                                     }
 
                                 }
@@ -294,14 +294,15 @@ namespace ToolHelper
                      downisRun = true;
                      for (int i = 0; i < threacount; i++)
                      {
-                         NextQuery();
+                         if (NextQuery())
+                         {
+                             tc.allThreadNumber++;
+                         }
                      }
 
                      //webClient.DownloadDataAsync(uri,dm);
                      //MemoryStream ms = DoRequest(uri, dm);
                  }
-
-              
              }
           );
 
@@ -375,9 +376,9 @@ namespace ToolHelper
             }
 
             //完成下载 触发事件
-            if (urls.Count > 0&&NextQuery())
+            if (urls.Count > 0 && NextQuery())
             {
-                
+
             }
             else
             {
