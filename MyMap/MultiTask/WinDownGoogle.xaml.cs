@@ -91,11 +91,13 @@ namespace MultiTask
                 int savemode = 0;
                 int.TryParse(args[11], out savemode);
 
+
+
                 isotherRun = true;
                 ButtonStartTasks.IsEnabled = false;//禁用开始多任务按钮
                 ComboBoxZoom.IsEnabled = false;
                 ButtonSS.IsEnabled = false;
-
+                ComboBoxMapType.IsEditable = false;
                 //ButtonSS_Click(null, null);//调用开始按钮
 
 

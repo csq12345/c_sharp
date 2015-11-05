@@ -348,6 +348,9 @@ namespace ToolHelper
 
                     if (completeDownModels.Count > 100)//这里只处理大于100的队列 如果不大于100 则由最后一次空计数时保存
                     {
+
+                      
+
                         emptycount = 0;//重置空计数
                         while (true)
                         {
@@ -369,7 +372,7 @@ namespace ToolHelper
                                 break;
                             }
                         }
-
+                        OnPrecessStatuEvent("已保存：" + savecount);
 
 
                     }
