@@ -49,14 +49,21 @@ namespace MultiTask
             ComboBoxMapType.Items.Add(new { name = "卫星", value = MapType.wx });
             ComboBoxMapType.Items.Add(new { name = "地形", value = MapType.dx });
             ComboBoxMapType.SelectedIndex = 0;
+
+            ComboBoxSaveMode.DisplayMemberPath = "name";
+            ComboBoxSaveMode.SelectedValuePath = "value";
+            ComboBoxSaveMode.Items.Add(new { name = "即时保存", value = 0 });
+            ComboBoxSaveMode.Items.Add(new { name = "批量保存", value = 1 });
+            ComboBoxSaveMode.SelectedIndex = 0;
+
             downTool.oncomplete += downTool_oncomplete;
             downTool.onprecess += downTool_onprecess;
             downTool.onprecessStatu += downTool_onprecessStatu;
-
+            downTool.OnSaveComplete += downTool_OnSaveComplete;
             //获取开始截止参数
             string[] args = System.Environment.GetCommandLineArgs();
             //Title = string.Join(",", args);
-            if (args.Count() == 11)
+            if (args.Count() == 12)
             {
                 actionselectchange = false;
 
@@ -80,6 +87,9 @@ namespace MultiTask
                 int mti = 0;
                 int.TryParse(args[10], out mti);
                 ComboBoxMapType.SelectedIndex = mti;
+
+                int savemode = 0;
+                int.TryParse(args[11], out savemode);
 
                 isotherRun = true;
                 ButtonStartTasks.IsEnabled = false;//禁用开始多任务按钮
@@ -111,11 +121,32 @@ namespace MultiTask
                 ButtonReady_Click(null, null);//调用估算按钮
 
                 MapType maptype = (MapType)ComboBoxMapType.SelectedValue;
-                StartDown(maptype, x1, x2, y1, y2, zoom, t, sx, sy, ex, ey);
+                StartDown(maptype, x1, x2, y1, y2, zoom, t, sx, sy, ex, ey, savemode);
             }
         }
 
+        void downTool_OnSaveComplete(int savecount)
+        {
+            ButtonSS.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (isotherRun)
+                {
+                    ShowInfo("完成保存1：" + savecount);
+                }
+                else
+                {
+
+                    ShowInfo("完成保存：" + savecount);
+                }
+            }));
+        }
+
         void downTool_onprecessStatu(string statu)
+        {
+            ShowInfo(statu);
+        }
+
+        void ShowInfo(string info)
         {
             ListBoxStatu.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -123,10 +154,9 @@ namespace MultiTask
                 {
                     ListBoxStatu.Items.RemoveAt(300);
                 }
-                ListBoxStatu.Items.Insert(0, statu);
+                ListBoxStatu.Items.Insert(0, info);
             }), null);
         }
-
 
         private void ButtonSS_Click(object sender, RoutedEventArgs e)
         {
@@ -156,7 +186,8 @@ namespace MultiTask
                 zoom = int.Parse(ComboBoxZoom.SelectedItem.ToString());
                 MapType maptype = (MapType)ComboBoxMapType.SelectedValue;
 
-                StartDown(maptype, x1, x2, y1, y2, zoom, t, sx, sy, ex, ey);
+                StartDown(maptype, x1, x2, y1, y2, zoom, t, sx, sy, ex, ey,
+                    (int)ComboBoxSaveMode.SelectedValue);
 
                 isrun = true;
                 ButtonSS.Content = "停止";
@@ -164,10 +195,11 @@ namespace MultiTask
         }
 
         void StartDown(MapType mt, int x1, int x2, int y1, int y2, int zoom, int threadnumber,
-            int passstartx, int passstarty, int passendx, int passendy)
+            int passstartx, int passstarty, int passendx, int passendy, int savemode)
         {
+
             downTool.DownStart(mt, x1, x2, y1, y2, zoom, "D:/temp/googlepic", threadnumber,
-                passstartx, passstarty, passendx, passendy);
+                passstartx, passstarty, passendx, passendy, savemode == 0 ? false : true);
         }
 
 
@@ -191,7 +223,7 @@ namespace MultiTask
             );
         }
 
-        void downTool_oncomplete(int AllCompleteCount)
+        void downTool_oncomplete(int AllCompleteCount,bool ismulsave)
         {
             isrun = false;
             ButtonSS.Dispatcher.BeginInvoke(new Action(() =>
@@ -199,7 +231,15 @@ namespace MultiTask
                 ButtonSS.Content = "开始";
                 if (isotherRun)
                 {
-                    this.Close();
+                    if (ismulsave)
+                    {
+                        
+                    }
+                    else
+                    {
+                         this.Close(); 
+                    }
+                  
                 }
                 else
                 {
@@ -371,7 +411,7 @@ namespace MultiTask
 
 
                     int maxsize = (startnum - endnum) / tasknum;
-
+                    int savemode = (int)ComboBoxSaveMode.SelectedValue;
 
 
                     Task task = new Task(() =>
@@ -398,9 +438,9 @@ namespace MultiTask
                                     Process p = new Process();
                                     ProcessStartInfo psi = new ProcessStartInfo("MultiTask.exe",
                                         startx + " " + endx + " " + starty + " " + endy + " " + x1 + " " + x2 + " " + y1 + " " + y2
-                                        + " " + zoom + " " + maptypeindex);
+                                        + " " + zoom + " " + maptypeindex + " " + savemode);
                                     p.StartInfo = psi;
-                                    psi.WindowStyle=ProcessWindowStyle.Minimized;
+                                    psi.WindowStyle = ProcessWindowStyle.Minimized;
 
                                     processes.Add(p);
                                     p.Start();
@@ -425,9 +465,9 @@ namespace MultiTask
                     {
                         if (!item.HasExited)
                         {
-                           item.Kill();  
+                            item.Kill();
                         }
-                       
+
                     }
                     processes.Clear();
                     Labeltask.Content = "开始任务";

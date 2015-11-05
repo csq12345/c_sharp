@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,6 +18,15 @@ namespace ToolHelper
         private List<Task> taskpool = new List<Task>();
         Queue<DownModel> urls = new Queue<DownModel>();
         private int downcount = 0;
+
+        /// <summary>
+        /// 已完成下载的
+        /// </summary>
+        Queue<DownModel> completeDownModels = new Queue<DownModel>();
+        /// <summary>
+        /// 是否使用批量保存模式
+        /// </summary>
+        private bool isMulSave = false;
         /// <summary>
         ///下载是否运行
         /// </summary>
@@ -54,13 +64,15 @@ namespace ToolHelper
         private int _passendy = 0;
         private MapType _mt;
         private Task downtask = null;
+
+        private Task saveTask = null;
         /// <summary>
         /// 插入队列的计数
         /// </summary>
         private int inputqueuecount = 0;
         public void DownStart(MapType mt, int startx, int endx, int starty, int endy,
             int zoom, string directorypath, int threadnumber,
-            int passstartx, int passstarty, int passendx, int passendy)
+            int passstartx, int passstarty, int passendx, int passendy, bool savemode = false)
         {
             saveInfo = new SaveInfo() { level = zoom, stopx = 0, stopy = 0 };
             saveInfo.savepath = directorypath + "/" + (int)mt;
@@ -76,6 +88,15 @@ namespace ToolHelper
             _mt = mt;
             //passx = x1;
             //passy = y1;
+            isMulSave = savemode;
+            if (isMulSave)
+            {
+                saveTask = CreateSaveTask();
+            }
+
+            downtask = CreateDownTask();
+
+
             CreateThread(startx, endx, starty, endy, passstartx, passstarty, passendx, passendy);
         }
 
@@ -87,7 +108,8 @@ namespace ToolHelper
         public void CreateThread(int startx, int endx, int starty, int endy,
             int passstartx, int passstarty, int passendx, int passendy)
         {
-            downtask = CreateDownTask();
+
+
 
             Thread ttt = new Thread(new ParameterizedThreadStart(CreateQueue));
             ttt.Start(new
@@ -266,6 +288,11 @@ namespace ToolHelper
                 {
                     downisRun = true;
                     downtask.Start();
+                    if (isMulSave)
+                    {
+                        saveTask.Start();
+                    }
+
                 }
                 else
                 {
@@ -309,6 +336,81 @@ namespace ToolHelper
             return t;
         }
 
+        Task CreateSaveTask()
+        {
+            Task t = new Task(() =>
+            {
+                int emptycount = 0;//保存队列空计数
+                int savecount = 0;
+                while (true)
+                {
+                    Thread.Sleep(2000);
+
+                    if (completeDownModels.Count > 100)//这里只处理大于100的队列 如果不大于100 则由最后一次空计数时保存
+                    {
+                        emptycount = 0;//重置空计数
+                        while (true)
+                        {
+                            if (completeDownModels.Count > 0)
+                            {
+                                DownModel dm = completeDownModels.Dequeue();
+                                if (dm != null)
+                                {
+                                    File.WriteAllBytes(dm.Fielname, dm.DataBytes);
+                                    savecount++;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+
+
+                    }
+                    else
+                    {
+                        emptycount++;
+
+                        if (emptycount > 10)//如果保存队列十次空 则表示没有要保存的信息
+                        {
+                            while (true)
+                            {
+                                if (completeDownModels.Count > 0)
+                                {
+                                    DownModel dm = completeDownModels.Dequeue();
+                                    if (dm != null)
+                                    {
+                                        File.WriteAllBytes(dm.Fielname, dm.DataBytes);
+                                        savecount++;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                           break; 
+                        }
+                    }
+
+                }
+
+                //保存队列完成  触发事件
+                OnSaveCompleteEventHandle(savecount);
+            });
+            return t;
+        }
+
         public void DownStop()
         {
             addqueueisRun = false;
@@ -320,22 +422,45 @@ namespace ToolHelper
         }
         bool NextQuery()
         {
-            DownModel dm = urls.Dequeue();
-            if (dm != null)
+            if (urls.Count > 0)
             {
-                Uri uri = new Uri(dm.Url);
-                WebClient webClient = GetWebClient();
-                webClient.DownloadFileAsync(uri, dm.Fielname, dm);
-                return true;
-                //   Task t = new Task(() =>
-                //   {
 
-                //   }
-                //);
 
-                //   t.Start();
+                DownModel dm = urls.Dequeue();
+                if (dm != null)
+                {
+                    Uri uri = new Uri(dm.Url);
+                    WebClient webClient = GetWebClient();
+                    if (isMulSave)
+                    {
+                        webClient.DownloadDataAsync(uri, dm);
+                    }
+                    else
+                    {
+                        webClient.DownloadFileAsync(uri, dm.Fielname, dm);
+                    }
+
+
+                    return true;
+                    //   Task t = new Task(() =>
+                    //   {
+
+                    //   }
+                    //);
+
+                    //   t.Start(); 
+                }
+                else
+                {
+                    return false;
+                }
+               
             }
-            return false;
+            else
+            {
+                return false;
+            }
+
 
         }
 
@@ -344,22 +469,109 @@ namespace ToolHelper
             //WebClient webClient = (WebClient)sender;
             //webClient.DownloadDataCompleted -= webClient_DownloadDataCompleted;
             //webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
+            DownModel dm = (DownModel)e.UserState;
             if (e.Error == null)
             {
             }
             else
             {
-                DownModel dm = (DownModel)e.UserState;
+
+                OnPrecessStatuEvent("错误。" + e.Error.Message + " " + dm.Url);
+                errdm.Add(dm);
+            }
+            DownCompleteProcess(dm);
+            //downcount++;
+            //if (downcount % 20 == 0)
+            //{
+            //    if (downcount % 500 == 0)
+            //    {
+            //        DownModel dm = (DownModel)e.UserState;
+            //        if (dm.x > saveInfo.stopx)
+            //        {
+            //            saveInfo.stopx = dm.x;
+            //        }
+            //        if (dm.y > saveInfo.stopy)
+            //        {
+            //            saveInfo.stopy = dm.y;
+            //        }
+            //        File.WriteAllText(saveInfo.savepath + "/saveinfo.inf",
+            //                           saveInfo.level + "," + saveInfo.stopx + "," + saveInfo.stopy);
+            //    }
+
+            //    OnPrecessEvent(downcount);
+            //}
+
+            ////完成下载 触发事件
+            //if (urls.Count > 0 && NextQuery())
+            //{
+
+            //}
+            //else
+            //{
+            //    lock (tc)
+            //    {
+            //        if (tc.allThreadNumber > 0)
+            //        {
+            //            tc.allThreadNumber--;
+            //            OnPrecessStatuEvent("线程完成 剩余:" + tc.allThreadNumber);
+            //            DownModel dm = (DownModel)e.UserState;
+            //            if (dm.x > saveInfo.stopx)
+            //            {
+            //                saveInfo.stopx = dm.x;
+            //            }
+            //            if (dm.y > saveInfo.stopy)
+            //            {
+            //                saveInfo.stopy = dm.y;
+            //            }
+
+            //            if (tc.allThreadNumber == 0)
+            //            {
+            //                OnPrecessStatuEvent("线程全部完成 触发完成事件");
+            //                downisRun = false;
+            //                File.WriteAllText(saveInfo.savepath + "/saveinfo.inf",
+            //                    saveInfo.level + "," + saveInfo.stopx + "," + saveInfo.stopy);
+            //                OnCompleteEvent(downcount,isMulSave);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            OnPrecessStatuEvent("线程全部完成");
+            //        }
+            //    }
+
+            //}
+
+
+
+        }
+
+        void webClient_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
+        {
+            DownModel dm = (DownModel)e.UserState;
+            if (e.Error == null)
+            {
+
+                dm.DataBytes = e.Result;
+                completeDownModels.Enqueue(dm);
+            }
+            else
+            {
+
                 OnPrecessStatuEvent("错误。" + e.Error.Message + " " + dm.Url);
                 errdm.Add(dm);
             }
 
+            DownCompleteProcess(dm);
+        }
+
+
+        void DownCompleteProcess(DownModel dm)
+        {
             downcount++;
             if (downcount % 20 == 0)
             {
                 if (downcount % 500 == 0)
                 {
-                    DownModel dm = (DownModel)e.UserState;
                     if (dm.x > saveInfo.stopx)
                     {
                         saveInfo.stopx = dm.x;
@@ -388,7 +600,7 @@ namespace ToolHelper
                     {
                         tc.allThreadNumber--;
                         OnPrecessStatuEvent("线程完成 剩余:" + tc.allThreadNumber);
-                        DownModel dm = (DownModel)e.UserState;
+
                         if (dm.x > saveInfo.stopx)
                         {
                             saveInfo.stopx = dm.x;
@@ -404,7 +616,7 @@ namespace ToolHelper
                             downisRun = false;
                             File.WriteAllText(saveInfo.savepath + "/saveinfo.inf",
                                 saveInfo.level + "," + saveInfo.stopx + "," + saveInfo.stopy);
-                            OnCompleteEvent(downcount);
+                            OnCompleteEvent(downcount, isMulSave);
                         }
                     }
                     else
@@ -414,33 +626,8 @@ namespace ToolHelper
                 }
 
             }
-
-
-
         }
 
-        void webClient_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
-        {
-            WebClient webClient = (WebClient)sender;
-
-            webClient.DownloadDataCompleted -= webClient_DownloadDataCompleted;
-            webClient.DownloadFileCompleted -= webClient_DownloadFileCompleted;
-            if (e.Error == null)
-            {
-                if (urls.Count > 0)
-                {
-                    DownModel dm = urls.Dequeue();
-                    Uri uri = new Uri(dm.Url);
-
-                    webClient = GetWebClient();
-                    webClient.DownloadDataAsync(uri, dm);
-                }
-                else
-                {
-
-                }
-            }
-        }
 
         MemoryStream DoRequest(Uri uri, DownModel dm)
         {
@@ -521,15 +708,15 @@ Chrome/28.0.1500.95 Safari/537.36 SE 2.X MetaSr 1.0";
         }
 
         #region 事件
-        public delegate void OnComplete(int AllCompleteCount);
+        public delegate void OnComplete(int AllCompleteCount, bool ismulsave);
 
         public event OnComplete oncomplete;
 
-        public void OnCompleteEvent(int AllCompleteCount)
+        public void OnCompleteEvent(int AllCompleteCount, bool ismulsave)
         {
             if (oncomplete != null)
             {
-                oncomplete.Invoke(AllCompleteCount);
+                oncomplete.Invoke(AllCompleteCount, ismulsave);
                 //oncomplete(AllCompleteCount);
             }
         }
@@ -559,6 +746,20 @@ Chrome/28.0.1500.95 Safari/537.36 SE 2.X MetaSr 1.0";
             }
         }
 
+
+
+        public delegate void OnSaveCompleteEvent(int savecount);
+        /// <summary>
+        ///  保存完成
+        /// </summary>	
+        public event OnSaveCompleteEvent OnSaveComplete;
+        public void OnSaveCompleteEventHandle(int savecount)
+        {
+            if (OnSaveComplete != null)
+            {
+                OnSaveComplete(savecount);
+            }
+        }
         #endregion
 
 

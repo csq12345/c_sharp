@@ -40,6 +40,7 @@
         </Button>
         <TextBox x:Name="TextBoxEndx" HorizontalAlignment="Left" Height="23" Margin="411,83,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
         <TextBox x:Name="TextBoxEndy" HorizontalAlignment="Left" Height="23" Margin="411,127,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="87"/>
+        <ComboBox Name="ComboBoxSaveMode" HorizontalAlignment="Left" Margin="437,28,0,0" VerticalAlignment="Top" Width="74"/>
 
     </Grid>
 </Window>

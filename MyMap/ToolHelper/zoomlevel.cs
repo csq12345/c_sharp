@@ -10,11 +10,11 @@ namespace ToolHelper
     {
         static System.Configuration.AppSettingsReader ar = new AppSettingsReader();
         static string url1 = ar.GetValue("url1", typeof(string)).ToString();
-        static string url2 = ar.GetValue("url1", typeof(string)).ToString();
+        static string url2 = ar.GetValue("url2", typeof(string)).ToString();
 
-        static string url3 = ar.GetValue("url1", typeof(string)).ToString();
+        static string url3 = ar.GetValue("url3", typeof(string)).ToString();
 
-        static string url4 = ar.GetValue("url1", typeof(string)).ToString();
+        static string url4 = ar.GetValue("url4", typeof(string)).ToString();
 
         public static Zoom GetLevel(int zoom,MapType mt)
         {
