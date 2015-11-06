@@ -349,7 +349,7 @@ namespace ToolHelper
                     if (completeDownModels.Count > 100)//这里只处理大于100的队列 如果不大于100 则由最后一次空计数时保存
                     {
 
-                      
+
 
                         emptycount = 0;//重置空计数
                         while (true)
@@ -378,31 +378,40 @@ namespace ToolHelper
                     }
                     else
                     {
-                        emptycount++;
-
-                        if (emptycount > 10)//如果保存队列十次空 则表示没有要保存的信息
+                        if (!downisRun)
                         {
-                            while (true)
+
+
+                            emptycount++;
+                            OnPrecessStatuEvent("保存队列空：" + emptycount);
+                            if (emptycount > 10) //如果保存队列十次空 则表示没有要保存的信息
                             {
-                                if (completeDownModels.Count > 0)
+                                while (true)
                                 {
-                                    DownModel dm = completeDownModels.Dequeue();
-                                    if (dm != null)
+                                    if (completeDownModels.Count > 0)
                                     {
-                                        File.WriteAllBytes(dm.Fielname, dm.DataBytes);
-                                        savecount++;
+                                        DownModel dm = completeDownModels.Dequeue();
+                                        if (dm != null)
+                                        {
+                                            File.WriteAllBytes(dm.Fielname, dm.DataBytes);
+                                            savecount++;
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
                                     }
                                     else
                                     {
                                         break;
                                     }
                                 }
-                                else
-                                {
-                                    break;
-                                }
+                                break;
                             }
-                           break; 
+                        }
+                        else
+                        {
+                            //下载还在进行 不累加空保存计数
                         }
                     }
 
@@ -457,7 +466,7 @@ namespace ToolHelper
                 {
                     return false;
                 }
-               
+
             }
             else
             {

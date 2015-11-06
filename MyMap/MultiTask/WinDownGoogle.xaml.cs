@@ -90,7 +90,7 @@ namespace MultiTask
 
                 int savemode = 0;
                 int.TryParse(args[11], out savemode);
-
+                ComboBoxSaveMode.SelectedIndex = savemode;
 
 
                 isotherRun = true;
@@ -133,12 +133,14 @@ namespace MultiTask
             {
                 if (isotherRun)
                 {
-                    ShowInfo("完成保存1：" + savecount);
+                    ShowInfo("完成批量保存：" + savecount);
+                    Title = "完成批量保存：" + savecount;
                 }
                 else
                 {
 
                     ShowInfo("完成保存：" + savecount);
+                    Title = "完成保存：" + savecount;
                 }
             }));
         }
