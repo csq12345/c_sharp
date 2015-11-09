@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,7 @@ namespace MultiTask
     /// </summary>
     public partial class WinDownGoogle : Window
     {
+        static System.Configuration.AppSettingsReader ar = new AppSettingsReader();
         private bool isrun = false;
         private DownTool downTool;
         /// <summary>
@@ -202,7 +204,8 @@ namespace MultiTask
             int passstartx, int passstarty, int passendx, int passendy, int savemode)
         {
 
-            downTool.DownStart(mt, x1, x2, y1, y2, zoom, "D:/temp/googlepic", threadnumber,
+            string savepath = ar.GetValue("savepath",typeof(string)).ToString();
+            downTool.DownStart(mt, x1, x2, y1, y2, zoom, savepath, threadnumber,
                 passstartx, passstarty, passendx, passendy, savemode == 0 ? false : true);
         }
 
