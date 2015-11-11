@@ -365,7 +365,7 @@ namespace ToolHelper
 
              }
           );
-
+          
             return t;
         }
 
@@ -397,7 +397,8 @@ namespace ToolHelper
                                     if (dm != null)
                                     {
                                         File.WriteAllBytes(dm.Fielname, dm.DataBytes);
-                                        //dm.Dispose();
+                                        
+                                        dm.Dispose();
                                         savecount++;
                                     }
                                     else
@@ -433,7 +434,7 @@ namespace ToolHelper
                                             if (dm != null)
                                             {
                                                 File.WriteAllBytes(dm.Fielname, dm.DataBytes);
-                                                //dm.Dispose();
+                                                dm.Dispose();
                                                 savecount++;
                                             }
                                             else
