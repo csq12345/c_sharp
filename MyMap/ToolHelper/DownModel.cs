@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ToolHelper
 {
-    public class DownModel
+    public class DownModel:IDisposable
     {
         public string Url { get; set; }
 
@@ -15,5 +15,12 @@ namespace ToolHelper
         public int y { get; set; }
 
         public byte[] DataBytes { get; set; }
+
+        public void Dispose()
+        {
+            Url = null;
+            Fielname = null; 
+            DataBytes = null;
+        }
     }
 }
