@@ -9,12 +9,23 @@ namespace ToolHelper
     public static class zoomlevel
     {
         static System.Configuration.AppSettingsReader ar = new AppSettingsReader();
+        /// <summary>
+        /// 平面
+        /// </summary>
         static string url1 = ar.GetValue("url1", typeof(string)).ToString();
+        /// <summary>
+        /// 卫星
+        /// </summary>
         static string url2 = ar.GetValue("url2", typeof(string)).ToString();
-
+        /// <summary>
+        /// 卫星线路
+        /// </summary>
         static string url3 = ar.GetValue("url3", typeof(string)).ToString();
-
+        /// <summary>
+        /// 地形
+        /// </summary>
         static string url4 = ar.GetValue("url4", typeof(string)).ToString();
+
         private static int mz = 0;
         static MapType mmt = MapType.pm;
         private static Zoom mzoom;

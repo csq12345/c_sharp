@@ -197,77 +197,82 @@ namespace ToolHelper
                             int partnum = 0;
                             string partDoc = "";
 
-                            for (int x = startx; x <= endx; x++)
+                            lock (urls)
                             {
-                                for (int y = starty; y <= endy; y++)
+
+
+                                for (int x = startx; x <= endx; x++)
                                 {
-                                    if (passstartx > 0)
+                                    for (int y = starty; y <= endy; y++)
                                     {
-                                        x = passstartx;
-                                        passstartx = 0;
-                                    }
-                                    if (passstarty > 0)
-                                    {
-                                        y = passstarty;
-                                        passstarty = 0;
-                                    }
-
-
-
-                                    url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
-                                    DownModel dm = new DownModel();
-                                    dm.Url = url;
-
-                                    dm.x = x;
-                                    dm.y = y;
-                                    partnum = (int)Math.Floor((double)((double)(x + 1) * (double)(zm.maxY + 1) / 1000));
-                                    //计算分部文件夹编号
-
-
-                                    partDoc = saveInfo.savepath + "/" + _zoom + "/" + _zoom + "_" + partnum;
-                                    if (!Directory.Exists(partDoc))
-                                    {
-                                        Directory.CreateDirectory(partDoc);
-                                    }
-
-                                    dm.Fielname = partDoc + "/" + _zoom + "_" + x + "_" + y + ".png";
-                                    urls.Enqueue(dm);
-                                    inputqueuecount++;
-
-                                    if (x == passendx && y == passendy)
-                                    {
-
-                                    }
-                                    if (x == passendx && y == passendy)
-                                    {
-                                        //开始数大于结束数 停止队列
-                                        passstartx = endx + 1;
-                                        passstarty = endy + 1;
-                                        x = endx + 1;//设置x值大于截止值 则下次循环将不执行
-                                        y = endy + 1;
-                                        onprecessStatu("队列 x y 等于结束数 " + passendx + "x" + passendy);
-                                        if (inputqueuecount <= 100 && downisRun == false)
+                                        if (passstartx > 0)
                                         {
-                                            BeginDown();//开始下载
+                                            x = passstartx;
+                                            passstartx = 0;
                                         }
-                                    }
-                                    else
-                                    {
-
-                                        if (urls.Count > 100 && downisRun == false)
+                                        if (passstarty > 0)
                                         {
-                                            BeginDown();//开始下载
+                                            y = passstarty;
+                                            passstarty = 0;
                                         }
 
-                                        if (urls.Count > 200)
+
+
+                                        url = zm.url.Replace("@X", x.ToString()).Replace("@Y", y.ToString());
+                                        DownModel dm = new DownModel();
+                                        dm.Url = url;
+
+                                        dm.x = x;
+                                        dm.y = y;
+                                        partnum = (int)Math.Floor((double)((double)(x + 1) * (double)(zm.maxY + 1) / 1000));
+                                        //计算分部文件夹编号
+
+
+                                        partDoc = saveInfo.savepath + "/" + _zoom + "/" + _zoom + "_" + partnum;
+                                        if (!Directory.Exists(partDoc))
                                         {
-                                            passstartx = x;
-                                            passstarty = y;
-                                            onprecessStatu("队列 " + urls.Count + " 停止入列。" + passstartx + "X" + passstarty + " 入列总数" + inputqueuecount);
+                                            Directory.CreateDirectory(partDoc);
+                                        }
+
+                                        dm.Fielname = partDoc + "/" + _zoom + "_" + x + "_" + y + ".png";
+                                        urls.Enqueue(dm);
+                                        inputqueuecount++;
+
+                                        if (x == passendx && y == passendy)
+                                        {
+
+                                        }
+                                        if (x == passendx && y == passendy)
+                                        {
+                                            //开始数大于结束数 停止队列
+                                            passstartx = endx + 1;
+                                            passstarty = endy + 1;
                                             x = endx + 1;//设置x值大于截止值 则下次循环将不执行
                                             y = endy + 1;
+                                            onprecessStatu("队列 x y 等于结束数 " + passendx + "x" + passendy);
+                                            if (inputqueuecount <= 100 && downisRun == false)
+                                            {
+                                                BeginDown();//开始下载
+                                            }
                                         }
+                                        else
+                                        {
 
+                                            if (urls.Count > 100 && downisRun == false)
+                                            {
+                                                BeginDown();//开始下载
+                                            }
+
+                                            if (urls.Count > 200)
+                                            {
+                                                passstartx = x;
+                                                passstarty = y;
+                                                onprecessStatu("队列 " + urls.Count + " 停止入列。" + passstartx + "X" + passstarty + " 入列总数" + inputqueuecount);
+                                                x = endx + 1;//设置x值大于截止值 则下次循环将不执行
+                                                y = endy + 1;
+                                            }
+
+                                        }
                                     }
                                 }
                             }
@@ -288,7 +293,7 @@ namespace ToolHelper
             catch (Exception ex)
             {
 
-                onprecessStatu(ex.Message+ " "+ ex.StackTrace);
+                onprecessStatu(ex.Message + " " + ex.StackTrace);
             }
         }
 
@@ -365,7 +370,7 @@ namespace ToolHelper
 
              }
           );
-          
+
             return t;
         }
 
@@ -386,7 +391,7 @@ namespace ToolHelper
                         if (completeDownModels.Count > 100)//这里只处理大于100的队列 如果不大于100 则由最后一次空计数时保存
                         {
 
-
+                            string filepath = "";
 
                             emptycount = 0;//重置空计数
                             while (true)
@@ -396,8 +401,15 @@ namespace ToolHelper
                                     DownModel dm = completeDownModels.Dequeue();
                                     if (dm != null)
                                     {
-                                        File.WriteAllBytes(dm.Fielname, dm.DataBytes);
-                                        
+                                        filepath = dm.Fielname;
+                                        FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write);
+                                        fs.Write(dm.DataBytes, 0, dm.DataBytes.Length);
+
+                                        fs.Flush();
+                                        fs.Close();
+                                        fs.Dispose();
+                                        //File.WriteAllBytes(dm.Fielname, dm.DataBytes);
+
                                         dm.Dispose();
                                         savecount++;
                                     }
@@ -411,6 +423,8 @@ namespace ToolHelper
                                     break;
                                 }
                             }
+
+                            GC.Collect();
                             OnPrecessStatuEvent("已保存：" + savecount);
 
 
@@ -425,7 +439,7 @@ namespace ToolHelper
                                 OnPrecessStatuEvent("保存队列空：" + emptycount);
                                 if (emptycount > 10) //如果保存队列十次空 则表示没有要保存的信息
                                 {
-
+                                    string filepath = "";
                                     while (true)
                                     {
                                         if (completeDownModels.Count > 0)
@@ -433,7 +447,14 @@ namespace ToolHelper
                                             DownModel dm = completeDownModels.Dequeue();
                                             if (dm != null)
                                             {
-                                                File.WriteAllBytes(dm.Fielname, dm.DataBytes);
+                                                filepath = dm.Fielname;
+                                                FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write);
+                                                fs.Write(dm.DataBytes, 0, dm.DataBytes.Length);
+
+                                                fs.Flush();
+                                                fs.Close();
+                                                fs.Dispose();
+                                                //File.WriteAllBytes(dm.Fielname, dm.DataBytes);
                                                 dm.Dispose();
                                                 savecount++;
                                             }
@@ -464,7 +485,7 @@ namespace ToolHelper
                 catch (Exception ex)
                 {
                     DownStop();
-                    onprecessStatu(ex.Message+" "+ex.StackTrace);
+                    onprecessStatu(ex.Message + " " + ex.StackTrace);
 
                 }
             });
@@ -489,16 +510,20 @@ namespace ToolHelper
                     DownModel dm = urls.Dequeue();
                     if (dm != null)
                     {
-                        Uri uri = new Uri(dm.Url);
-                        WebClient webClient = GetWebClient();
+                        //Uri uri = new Uri(dm.Url);
+                        //WebClient webClient = GetWebClient();
+                        HttpWebRequest request = GetRequest(dm.Url);
+                        dm.webrequest = request;
+
+
                         if (isMulSave)
                         {
-                            webClient.DownloadDataAsync(uri, dm);
-
+                            //webClient.DownloadDataAsync(uri, dm);
+                            request.BeginGetResponse(new AsyncCallback(HttpWebRequest_GetResponseCallBack), dm);
                         }
                         else
                         {
-                            webClient.DownloadFileAsync(uri, dm.Fielname, dm);
+                            //webClient.DownloadFileAsync(uri, dm.Fielname, dm);
                         }
 
 
@@ -526,6 +551,65 @@ namespace ToolHelper
 
         }
 
+        void HttpWebRequest_GetResponseCallBack(IAsyncResult iar)
+        {
+            DownModel dm = (DownModel)iar.AsyncState;
+            WebRequest request = (WebRequest)dm.webrequest;
+
+            WebResponse response = null;
+
+            try
+            {
+
+                response = request.EndGetResponse(iar);
+                //response = request.GetResponse();
+               
+            }
+            catch (Exception ex)
+            {
+
+                onprecessStatu(ex.Message + " " + ex.StackTrace);
+
+            }
+
+            if (response != null)
+            {
+                Stream stream = response.GetResponseStream();
+                byte[] buff = new byte[500];
+
+                MemoryStream ms = new MemoryStream();
+                while (true)
+                {
+                    int len = stream.Read(buff, 0, buff.Length);
+                    if (len > 0)
+                    {
+                        ms.Write(buff, 0, len);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                dm.DataBytes = ms.ToArray();
+
+                ms.Close();
+                ms.Dispose();
+                response.Close();
+                response.Dispose();
+                request = null;
+                buff = null;
+                stream.Close();
+
+                lock (completeDownModels)
+                {
+                    completeDownModels.Enqueue(dm);
+                }
+
+            }
+            DownCompleteProcess(dm);
+        }
+
         void webClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             try
@@ -546,7 +630,10 @@ namespace ToolHelper
                 DownStop();
                 onprecessStatu(ex.Message + " " + ex.StackTrace);
             }
-            ((WebClient)sender).DownloadFileCompleted -= webClient_DownloadFileCompleted;
+            WebClient tw = ((WebClient)sender);
+            tw.DownloadFileCompleted -= webClient_DownloadFileCompleted;
+            tw.Dispose();
+            tw = null;
         }
 
         void webClient_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
@@ -560,9 +647,9 @@ namespace ToolHelper
                     dm.DataBytes = e.Result;
                     lock (completeDownModels)
                     {
-                        completeDownModels.Enqueue(dm); 
+                        completeDownModels.Enqueue(dm);
                     }
-                   
+
                 }
                 else
                 {
@@ -575,13 +662,14 @@ namespace ToolHelper
             catch (Exception ex)
             {
                 DownStop();
-                onprecessStatu(ex.Message+" "+ex.StackTrace);
+                onprecessStatu(ex.Message + " " + ex.StackTrace);
             }
 
+            WebClient tw = ((WebClient)sender);
 
-
-            ((WebClient)sender).DownloadDataCompleted -= webClient_DownloadDataCompleted;
-
+            tw.DownloadDataCompleted -= webClient_DownloadDataCompleted;
+            tw.Dispose();
+            tw = null;
         }
 
 
@@ -734,6 +822,27 @@ Chrome/28.0.1500.95 Safari/537.36 SE 2.X MetaSr 1.0";
             webClient.DownloadDataCompleted += webClient_DownloadDataCompleted;
             webClient.DownloadFileCompleted += webClient_DownloadFileCompleted;
             return webClient;
+        }
+
+        HttpWebRequest GetRequest(string url)
+        {
+
+
+            Uri ui = new Uri(url);
+
+
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+            request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
+            request.Host = ui.Host;
+            request.Headers.Add("Accept-Encoding", "gzip, deflate, sdch");
+            request.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8");
+            request.Headers.Add("Cache-Control", "no-cache");
+            request.UserAgent =
+                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36";
+            request.Headers.Add("DNT", "1");
+            request.Headers.Add("Pragma", "no-cache");
+            ui = null;
+            return request;
         }
 
         #region 事件

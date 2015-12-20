@@ -49,6 +49,7 @@ namespace MultiTask
             ComboBoxMapType.SelectedValuePath = "value";
             ComboBoxMapType.Items.Add(new { name = "平面", value = MapType.pm });
             ComboBoxMapType.Items.Add(new { name = "卫星", value = MapType.wx });
+            ComboBoxMapType.Items.Add(new { name = "卫星线路", value = MapType.wxxl });
             ComboBoxMapType.Items.Add(new { name = "地形", value = MapType.dx });
             ComboBoxMapType.SelectedIndex = 0;
 

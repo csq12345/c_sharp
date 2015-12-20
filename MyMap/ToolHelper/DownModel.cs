@@ -21,6 +21,9 @@ namespace ToolHelper
             Url = null;
             Fielname = null; 
             DataBytes = null;
+            webrequest = null;
         }
+
+        public object webrequest { get; set; }
     }
 }
